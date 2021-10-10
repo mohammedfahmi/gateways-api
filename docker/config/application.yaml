@@ -1,0 +1,58 @@
+server:
+  servlet:
+    context-path: /gateways-api
+springdoc:
+  packages-to-scan: com.musala.gatewaysapi.controller
+  paths-to-match: /api/rest/**
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+logging:
+  level:
+    root: info
+    com:
+      rantandrave:
+        discoverapi:
+          configuration:
+            RequestLoggingFilterConfiguration: info
+management:
+  endpoints:
+    enabled: false
+    sensitive: true
+    health:
+      enabled: true
+      sensitive: true
+  server:
+    servlet:
+      context-path: /actuator
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  gson:
+    exclude-fields-without-expose-annotation: true
+    date-format: yyyy-MM-dd'T'HH:mm:ss'Z'
+  datasource:
+    url: jdbc:postgresql://${fastfeedback.datasource.host}:${fastfeedback.datasource.port}/rantandravev3
+    username: ${fastfeedback.datasource.username}
+    password: ${fastfeedback.datasource.password}
+    validation-query: SELECT 1;
+    hikari:
+      minimumIdle: 10
+      maximumPoolSize: 20
+      idleTimeout: 30000
+      poolName: SpringBootJPAHikariCP
+      maxLifetime: 1800000
+      connectionTimeout: 90000
+  jpa:
+    open-in-view: true
+  liquibase:
+    databaseChangeLogTable: DISCOVER_DATABASECHANGELOG
+    databaseChangeLogLockTable: DISCOVER_DATABASECHANGELOGLOCK
+endpoint:
+  security:
+    user:
+      name: ${discover.security.name}
+      password: ${discover.security.password}
+      role: ${discover.security.role}
+      management-context: ${management.server.servlet.context-path}

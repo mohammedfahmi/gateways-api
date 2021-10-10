@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: musala-0001-002
+      author: mohammed fahmy
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: devices
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: devices_pkey
+                  name: device_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: devices_uuid
+                  type: varchar(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: devices_name
+                  type: varchar(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: vendor
+                  type: varchar(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: device_creation_date
+                  type: timestamp
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: status
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: gateway_id
+                  type: BIGINT
+            tableName: devices
+        - addForeignKeyConstraint:
+            baseColumnNames: gateway_id
+            baseTableName: devices
+            baseTableSchemaName: gateway
+            constraintName: fk_gateway_device
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: gateway_id
+            referencedTableName: gateways
+            referencedTableSchemaName: gateway
+            validate: true
