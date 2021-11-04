@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: musala-0001-004
+      author: mohammed fahmy
+      changes:
+        - sqlFile:
+            dbms: 'mysql'
+            endDelimiter: \n;
+            splitStatements: true
+            path: triggers/before_devices_insert_trigger.sql
+            stripComments: true

@@ -4,13 +4,12 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
+
 @Setter
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name="devices")
 @Entity
 public class Device {

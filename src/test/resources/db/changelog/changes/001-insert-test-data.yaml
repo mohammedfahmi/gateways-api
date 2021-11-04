@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: musala-test-0001-001
+      author: mohammed fahmy
+      changes:
+        - sqlFile:
+            dbms: 'mysql'
+            endDelimiter: \n;
+            splitStatements: true
+            path: testData/gateways_test_data.sql
+            stripComments: true
+  - changeSet:
+      id: musala-test-0001-002
+      author: mohammed fahmy
+      changes:
+        - sqlFile:
+            dbms: 'mysql'
+            endDelimiter: \n;
+            splitStatements: true
+            path: testData/devices_test_data.sql
+            stripComments: true

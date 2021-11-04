@@ -6,6 +6,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -31,7 +32,7 @@ class ErrorHandlingControllerAdvice {
 
     private static final String ERROR_KEY = "error";
     private static final String MISSING_ONE_OR_MORE_FROM_REQUEST_PARAMETERS =
-            "Missing one or more from request parameters";
+            "Missing one or more from request parameters, {}";
     private static final String REQUESTED_PARAMETERS_IN_WRONG_FORMAT =
             "Failed to parse the request parameters as they are in wrong format.";
     private static final String UNEXPECTED_EXCEPTION = "something went wrong.";
@@ -96,6 +97,14 @@ class ErrorHandlingControllerAdvice {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ResponseEntity<AbstractMap.SimpleEntry<String, String>> onException(final ValidationException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.badRequest()
+                .body(new AbstractMap.SimpleEntry<>(ERROR_KEY, MessageFormat.format(VALIDATION_FAILED, e.getMessage())));
+    }
+
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ResponseEntity<AbstractMap.SimpleEntry<String, String>> onException(final BindException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new AbstractMap.SimpleEntry<>(ERROR_KEY, MessageFormat.format(VALIDATION_FAILED, e.getMessage())));

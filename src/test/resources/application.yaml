@@ -1,3 +1,5 @@
+liquibase:
+  contexts: test
 server:
   servlet:
     context-path: /gateways-api
@@ -67,4 +69,4 @@ endpoint:
       name: ${gateways.security.name}
       password: ${gateways.security.password}
       role: ${gateways.security.role}
-      management-context: ${management.server.base-path}
+      management-context: ${management.server.servlet.context-path}

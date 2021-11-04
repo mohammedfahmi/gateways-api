@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: musala-0001-003
+      author: mohammed fahmy
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: http_trace
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: http_trace_pkey
+                  name: trace_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: traced_request_response
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: trace_date
+                  type: timestamp
+            tableName: http_trace

@@ -1,17 +1,16 @@
 package com.musala.gatewaysapi.entities;
 
+import com.musala.gatewaysapi.models.AbstractGateway;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Setter
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "gateways")
 @Entity
 public class Gateway {
@@ -32,4 +31,11 @@ public class Gateway {
     @OneToMany()
     @JoinColumn(name = "gateway_id", nullable = false)
     private List<Device> devices;
+
+    public AbstractGateway getAbstractGatewayFromGateway() {
+        return AbstractGateway.builder()
+                .gatewayUuid(this.getGatewayUuid())
+                .gatewayName(this.getGatewayName())
+                .gatewayIpv4(this.getGatewayIpv4()).build();
+    }
 }

@@ -3,13 +3,48 @@ services:
   mysql_db:
     image: mysql:latest
     ports:
-      - 3306:3306
+      - '3306:3306'
     environment:
       MYSQL_ROOT_PASSWORD: root_pass
       MYSQL_DATABASE: gateway
     volumes:
       - ./src/main/resources/initDB:/docker-entrypoint-initdb.d
+    networks:
+      - gateways
+
+  gateways-api:
+    image:  mohammedfahmi/gateways-api
+    build: .
+    environment:
+      JAVA_OPTS: '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+      MUSALA_DATASOURCE_HOST: mysql_db
+      MUSALA_DATASOURCE_PORT: 3306
+    ports:
+      - '8080:8080'
+      - '5005:5005'
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-s", "-f", "-i", "http://localhost:8080/gateways-api/actuator/health"]
       timeout: 20s
       retries: 10
+    networks:
+      - gateways
+
+  Liquibase_For_IT:
+    image: liquibase/liquibase:latest
+    depends_on:
+      gateways-api:
+        condition: service_healthy
+    links:
+      - gateways-api
+    environment:
+      INSTALL_MYSQL: true
+    volumes:
+      - ./src/test/resources:/liquibase/changelog
+    command:  ['--driver=com.mysql.cj.jdbc.Driver',
+               '--url=jdbc:mysql://host.docker.internal:3306/gateway',
+               '--changeLogFile=db/changelog/db.changelog-master.yaml',
+               '--username=dev', '--password=dev', '--databaseChangeLogTableName=GATEWAYS_DATABASECHANGEL',
+               '--databaseChangeLogLockTableName=GATEWAYS_DATABASECHANGELOGLOCK', 'update']
+networks:
+  gateways:
+    name: custom_gateways
