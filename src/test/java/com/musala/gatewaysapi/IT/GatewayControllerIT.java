@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.musala.gatewaysapi.models.AbstractGateway;
 import com.musala.gatewaysapi.models.GatewayModel;
 import lombok.extern.slf4j.Slf4j;
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpMethod;
@@ -16,29 +14,18 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.musala.gatewaysapi.IT.TestRestTemplate.*;
 import static com.musala.gatewaysapi.constants.ApiMapping.*;
 import static com.musala.gatewaysapi.utils.GatewaysTestUtils.*;
-import static com.musala.gatewaysapi.utils.TestUtils.asJsonString;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.with;
-import static org.awaitility.Durations.TWO_MINUTES;
-import static org.awaitility.pollinterval.FibonacciPollInterval.fibonacci;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, ITBaseContextExtension.class})
 @Slf4j
 public class GatewayControllerIT {
     private final Gson gson = new Gson();
-
-    @BeforeAll
-    static void beforeAll() {
-        Awaitility.setDefaultTimeout(TWO_MINUTES);
-        with().pollInterval(fibonacci().with().unit(SECONDS).and().offset(4)).await().until(TestRestTemplate::healthCheckCall);
-        with().pollInterval(fibonacci().with().unit(SECONDS).and().offset(4)).await().until(TestRestTemplate::testCall);
-    }
 
     @Test
     void getGateways_page4_size10_and_response200() {
@@ -71,7 +58,7 @@ public class GatewayControllerIT {
             fail();
         } catch (final HttpClientErrorException e) {
             assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
-            assertTrue(e.getMessage().contains("\"status\":401,\"error\":\"Unauthorized\",\"path\":\"/gateways-api/api/rest/gateways\"}"));
+            assertTrue(Objects.requireNonNull(e.getMessage()).contains("\"status\":401,\"error\":\"Unauthorized\",\"path\":\"/gateways-api/api/rest/gateways\"}"));
         } catch (final Exception e) {
             fail();
         }
@@ -118,7 +105,7 @@ public class GatewayControllerIT {
     void createGateway_With_Valid_Gateway_200() {
         final ResponseEntity<?> responseEntity = restCall(CREATE_NEW_GATEWAY, HttpMethod.POST, new HashMap<>(1),
                 String.class, prepareParams("gatewayUuid", UUID.randomUUID().toString(),
-                "gatewayName", "gatway-" + UUID.randomUUID(), "gatewayIpv4", "70.22.2.49"), true);
+                "gatewayName", "gateway-" + UUID.randomUUID(), "gatewayIpv4", "70.22.2.49"), true);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("{\"message\":\"Gateway created successfully\"}", responseEntity.getBody());
     }
@@ -170,13 +157,13 @@ public class GatewayControllerIT {
         String newGatewayUuid = UUID.randomUUID().toString();
         final ResponseEntity<?> responseEntity = restCall(UPDATE_GATEWAY_DETAILS, HttpMethod.PUT, new HashMap<>(1),
                 String.class, prepareParams("gatewayUuid", newGatewayUuid,
-                        "gatewayName", "gatway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, VALID_UUID);
+                        "gatewayName", "gateway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, VALID_UUID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(GATEWAY_UPDATED_SUCCESSFULLY, responseEntity.getBody());
         @SuppressWarnings("unused")
         final ResponseEntity<?> rollBackUpdateResponseEntity = restCall(UPDATE_GATEWAY_DETAILS, HttpMethod.PUT, new HashMap<>(1),
                 String.class, prepareParams("gatewayUuid", VALID_UUID,
-                        "gatewayName", "gatway-a3c2316a-3c2d-11ec-a662-0242ac160003", "gatewayIpv4", "70.22.2.45"), true, newGatewayUuid);
+                        "gatewayName", "gateway-a3c2316a-3c2d-11ec-a662-0242ac160003", "gatewayIpv4", "70.22.2.45"), true, newGatewayUuid);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(GATEWAY_UPDATED_SUCCESSFULLY, responseEntity.getBody());
     }
@@ -187,7 +174,7 @@ public class GatewayControllerIT {
         try {
             restCall(UPDATE_GATEWAY_DETAILS, HttpMethod.PUT, new HashMap<>(1),
                     String.class, prepareParams("gatewayUuid", newGatewayUuid,
-                            "gatewayName", "gatway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, newGatewayUuid  );
+                            "gatewayName", "gateway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, newGatewayUuid  );
             fail();
         } catch (final HttpClientErrorException e) {
             assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());

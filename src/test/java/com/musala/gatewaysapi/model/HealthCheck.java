@@ -1,4 +1,4 @@
-package com.musala.gatewaysapi.utils;
+package com.musala.gatewaysapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

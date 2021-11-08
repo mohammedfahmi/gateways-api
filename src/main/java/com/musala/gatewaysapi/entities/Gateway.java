@@ -32,8 +32,7 @@ public class Gateway {
     @Column(name = "gateway_ipv4", nullable = false)
     private String gatewayIpv4;
 
-    @OneToMany()
-    @JoinColumn(name = "gateway_id", nullable = false)
+    @OneToMany(mappedBy="gateway")
     private List<Device> devices;
 
     public AbstractGateway getAbstractGatewayFromGateway() {

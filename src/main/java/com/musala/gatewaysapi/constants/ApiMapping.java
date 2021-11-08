@@ -17,6 +17,7 @@ public final class ApiMapping {
     public static final String GET_GATEWAY_DETAILS_WITH_ITS_DEVICES = "/gateway/{gateway_uuid}";
     public static final String UPDATE_GATEWAY_DETAILS = "/gateway/{gateway_uuid}";
     public static final String CREATE_NEW_DEVICE = "/{gateway_uuid}/device";
+    public static final String GET_GATEWAY_DEVICE = "/{gateway_uuid}/device/{device_uuid}";
     public static final String UPDATE_GATEWAY_DEVICE = "/{gateway_uuid}/device/{device_uuid}";
     public static final String DELETE_GATEWAY_DEVICE = "/{gateway_uuid}/device/{device_uuid}";
 }

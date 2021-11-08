@@ -76,12 +76,14 @@ public class GatewayController {
             @ApiResponse(responseCode = "500",
                     description = "Internal Server Error"),
             @ApiResponse(responseCode = "400",
-                    description = "Invalid parameter")
+                    description = "Invalid parameter"),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found Entity")
     })
     @GetMapping(path = GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, produces = MediaType.APPLICATION_JSON_VALUE)
     public GatewayModel getGateway(
             @Valid @IsUuid @PathVariable String gateway_uuid, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-        return gatewayService.getGateway(gateway_uuid).getGatewayModelFromGateway();
+        return gatewayService.getGateway(uriBuilder, response, gateway_uuid).getGatewayModelFromGateway();
     }
 
     @Operation(summary = "create a Gateway", tags = {"createGateway"})
@@ -107,6 +109,21 @@ public class GatewayController {
                 .gatewayUuid(abstractGateway.getGatewayUuid()).build());
         return ResponseEntity.ok(Collections.singletonMap("message","Gateway created successfully"));
     }
+
+    @Operation(summary = "Update Gateway details", tags = {"updateGateway"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "successfully updated a single Gateway entity",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))
+                    }),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Server Error"),
+            @ApiResponse(responseCode = "400",
+                    description = "Invalid parameter"),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found Entity")
+    })
     @PutMapping(path = UPDATE_GATEWAY_DETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,String >> updateGateway(
             @Valid @IsUuid @PathVariable String gateway_uuid, @Valid @RequestBody AbstractGateway abstractGateway,

@@ -2,9 +2,9 @@ package com.musala.gatewaysapi.services;
 
 import com.google.gson.Gson;
 import com.musala.gatewaysapi.entities.Gateway;
-import com.musala.gatewaysapi.hateoas.listeners.CreationDiscoverabilityListener;
-import com.musala.gatewaysapi.hateoas.listeners.GatewayPaginationDiscoverabilityListener;
-import com.musala.gatewaysapi.hateoas.listeners.ListenerUtil;
+import com.musala.gatewaysapi.hateoas.listeners.GetDiscoverabilityListener;
+import com.musala.gatewaysapi.hateoas.listeners.SaveDiscoverabilityListener;
+import com.musala.gatewaysapi.hateoas.listeners.PaginationDiscoverabilityListener;
 import com.musala.gatewaysapi.models.AbstractGateway;
 import com.musala.gatewaysapi.models.GatewayPaginationRequest;
 import com.musala.gatewaysapi.repositories.GatewayRepository;
@@ -37,8 +37,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { GatewayService.class, GatewayRepository.class, ApplicationEventPublisher.class, Gateway.class,
-                            GatewayPaginationDiscoverabilityListener.class, AbstractGateway.class, GatewayPaginationRequest.class,
-                            CreationDiscoverabilityListener.class, ListenerUtil.class}
+                            PaginationDiscoverabilityListener.class, AbstractGateway.class, GatewayPaginationRequest.class,
+                            SaveDiscoverabilityListener.class, DiscoveryService.class, GetDiscoverabilityListener.class}
 )
 class GatewayServiceTest {
 
@@ -46,8 +46,7 @@ class GatewayServiceTest {
     private GatewayRepository gatewayRepository;
     @Autowired
     private GatewayService gatewayService;
-    @Autowired
-    private ListenerUtil listenerUtil;
+
     private final Gson gson = new Gson();
 
     @BeforeEach
@@ -67,7 +66,7 @@ class GatewayServiceTest {
         StringBuilder expectedResponse = new StringBuilder();
         StringBuilder actualResponse = new StringBuilder();
         HttpServletResponse mockResponse = new MockHttpServletResponse();
-        String ExpectedPaginationLinksHeader = getPaginationLinks();
+        String expectedPaginationLinksHeader = getPaginationLinks();
 
         GatewayPaginationRequest request =  gson.fromJson(PAGE_NUMBER_4_PAGE_SIZE_10, GatewayPaginationRequest.class);
         getAbstractGatewayListPage4Size10().stream().forEachOrdered(abstractGateway -> expectedResponse.append(gson.toJson(abstractGateway)));
@@ -75,7 +74,7 @@ class GatewayServiceTest {
         gatewayService.getGateways(getUriBuilder(), mockResponse, request)
                 .stream().forEachOrdered(abstractGateway -> actualResponse.append(gson.toJson(abstractGateway)));
         assertEquals( expectedResponse.toString(), actualResponse.toString());
-        assertEquals( mockResponse.getHeader("Link"), ExpectedPaginationLinksHeader);
+        assertEquals( mockResponse.getHeader("Link"), expectedPaginationLinksHeader);
     }
     @Test
     void getGateway_with_UUID_Successfully() {
@@ -83,6 +82,18 @@ class GatewayServiceTest {
         when(gatewayRepository.findGatewayByGatewayUuidEquals(any())).thenReturn(gateway);
         final Gateway response = gatewayService.getGateway(gateway.getGatewayUuid());
         assertEquals( asJsonString(gateway), asJsonString(response));
+    }
+    @Test
+    void getGateway_with_Discovery_Header_Successfully() {
+        final Gateway gateway = generateGateway();
+        gateway.setId(55L);
+        HttpServletResponse mockResponse = new MockHttpServletResponse();
+        String getResultLinksHeader = getResultLink();
+        when(gatewayRepository.findGatewayByGatewayUuidEquals(any())).thenReturn(gateway);
+        when(gatewayRepository.getAllGatewaysCount()).thenReturn(55);
+        final Gateway response = gatewayService.getGateway(getUriBuilder(), mockResponse, gateway.getGatewayUuid());
+        assertEquals( asJsonString(gateway), asJsonString(response));
+        assertEquals( mockResponse.getHeader("Link"), getResultLinksHeader);
     }
     @Test
     void getGateway_with_No_Valid_Gateway_UUID() {

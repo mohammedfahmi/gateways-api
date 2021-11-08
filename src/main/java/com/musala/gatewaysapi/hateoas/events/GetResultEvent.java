@@ -7,13 +7,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletResponse;
 
 @Getter
-public class CreationResultEvent extends ApplicationEvent {
+public class GetResultEvent extends ApplicationEvent {
     private HttpServletResponse response;
     private UriComponentsBuilder uriBuilder;
+    private Integer totalEntityCount;
 
-    public CreationResultEvent(Object source, UriComponentsBuilder  uriBuilder, HttpServletResponse response) {
+    public GetResultEvent(Object source, UriComponentsBuilder  uriBuilder, HttpServletResponse response, Integer totalEntityCount ) {
         super(source);
         this.response = response;
         this.uriBuilder = uriBuilder;
+        this.totalEntityCount = totalEntityCount;
     }
 }

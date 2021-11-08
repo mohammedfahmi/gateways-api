@@ -1,7 +1,7 @@
 package com.musala.gatewaysapi.IT;
 
 import com.musala.gatewaysapi.models.AbstractGateway;
-import com.musala.gatewaysapi.utils.HealthCheck;
+import com.musala.gatewaysapi.model.HealthCheck;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.Assert;

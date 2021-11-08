@@ -13,7 +13,7 @@ import static com.musala.gatewaysapi.hateoas.listeners.ListenerUtil.createLinkHe
 
 @NoArgsConstructor
 @Component
-public class GatewayPaginationDiscoverabilityListener
+public class PaginationDiscoverabilityListener
         implements ApplicationListener<PaginatedResultsEvent> {
 
     public static final int FIRST_PAGE = 0;

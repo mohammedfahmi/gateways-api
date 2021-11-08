@@ -1,6 +1,5 @@
 package com.musala.gatewaysapi.controllers;
 
-import com.google.gson.Gson;
 import com.musala.gatewaysapi.configuration.TraceRequestFilter;
 import com.musala.gatewaysapi.configuration.security.SecurityConfiguration;
 import com.musala.gatewaysapi.entities.Gateway;
@@ -35,7 +34,6 @@ import static com.musala.gatewaysapi.utils.TestUtils.prepareQueryParams;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -101,7 +99,7 @@ class GatewayControllerTest {
         final Gateway gateway = generateGateway();
         final String response = asJsonString(gateway.getGatewayModelFromGateway());
 
-        when(this.gatewayService.getGateway(any())).thenReturn(gateway);
+        when(this.gatewayService.getGateway(any(), any(), any())).thenReturn(gateway);
         ResultActions result = mockMvc.perform(
                 get(API_ROOT + GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, gateway.getGatewayUuid())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -112,7 +110,7 @@ class GatewayControllerTest {
     @Test
     void getGateway_NotValidGateway() throws Exception {
         final String response = "{\"error\":\"Requested Gateway with uuid c5aab27d-92ab-4858-bd6e-ebfda0fe48d2 is not Found\"}";
-        when(this.gatewayService.getGateway(any())).thenThrow(new EntityNotFoundException(MessageFormat.format(GATEWAY_NOT_FOUND_ERROR_MESSAGE, VALID_UUID_WITH_NO_GATEWAY)));
+        when(this.gatewayService.getGateway(any(), any(), any())).thenThrow(new EntityNotFoundException(MessageFormat.format(GATEWAY_NOT_FOUND_ERROR_MESSAGE, VALID_UUID_WITH_NO_GATEWAY)));
         ResultActions result = mockMvc.perform(
                 get(API_ROOT + GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, VALID_UUID_WITH_NO_GATEWAY)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,13 +120,12 @@ class GatewayControllerTest {
     }
     @Test
     void getGateway_NotValidUuid() throws Exception {
-        final String response = NOT_VALID_GATEWAY_UUID_MESSAGE;
         ResultActions result = mockMvc.perform(
                 get(API_ROOT + GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, NOT_VALID_UUID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(httpBasic(securityConfiguration.getName(), securityConfiguration.getPassword())));
         result.andExpect(status().is4xxClientError())
-                .andExpect(content().string(response));
+                .andExpect(content().string(NOT_VALID_GATEWAY_UUID_MESSAGE));
     }
     @Test
     void createGateway_ValidRequest() throws Exception {

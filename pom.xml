@@ -152,6 +152,17 @@
                             <goal>exec</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>push-containers</id>
+                        <phase>install</phase>
+                        <configuration>
+                            <executable>docker-compose</executable>
+                            <commandlineArgs>push</commandlineArgs>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

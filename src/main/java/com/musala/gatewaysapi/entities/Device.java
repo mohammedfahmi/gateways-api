@@ -36,6 +36,10 @@ public class Device {
     @Column(name = "status", nullable = false)
     private Boolean status = false;
 
+    @ManyToOne
+    @JoinColumn(name = "gateway_id", nullable = false)
+    private Gateway gateway;
+
     public DeviceModel getDeviceModelFromDevice() {
         return DeviceModel.builder()
                         .devicesUuid(this.devicesUuid == null ? "": this.devicesUuid)

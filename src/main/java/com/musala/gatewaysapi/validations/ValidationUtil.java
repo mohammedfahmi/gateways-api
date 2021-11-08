@@ -14,13 +14,12 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.musala.gatewaysapi.constants.Constants.IPV4_PATTERN;
-
 @Slf4j
 @Component
 @NoArgsConstructor
 public class ValidationUtil {
-    private static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
+
     public static void customViolationTemplateGeneration (
             @NonNull final String message,
             @NonNull final ConstraintValidatorContext constraintValidatorContext

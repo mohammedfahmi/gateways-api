@@ -21,7 +21,7 @@ import static java.lang.annotation.ElementType.*;
 @Target({TYPE, FIELD, PARAMETER})
 @Constraint(validatedBy = IsUuidImpl.class)
 public @interface IsUuid {
-    String message() default DEFAULT_REQUESTED_GATEWAY_UUID_IS_NOT_VALID;
+    String message() default DEFAULT_REQUESTED_UUID_IS_NOT_VALID;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
@@ -40,7 +40,7 @@ class IsUuidImpl
             UUID.fromString(uuid);
         } catch (IllegalArgumentException exception) {
             customViolationTemplateGeneration(
-                    MessageFormat.format(REQUESTED_GATEWAY_UUID_IS_NOT_VALID, uuid),constraintValidatorContext);
+                    MessageFormat.format(REQUESTED_UUID_IS_NOT_VALID, uuid),constraintValidatorContext);
             return false;
         }
         return true;
