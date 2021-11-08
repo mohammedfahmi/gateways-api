@@ -30,6 +30,7 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                    unique: true
                   name: gateway_uuid
                   type: varchar(255)
               - column:

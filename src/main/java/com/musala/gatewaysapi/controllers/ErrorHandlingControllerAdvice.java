@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 import java.text.MessageFormat;
 import java.util.AbstractMap;
@@ -37,6 +38,15 @@ class ErrorHandlingControllerAdvice {
             "Failed to parse the request parameters as they are in wrong format.";
     private static final String UNEXPECTED_EXCEPTION = "something went wrong.";
     private static final String VALIDATION_FAILED = "Validation failed, {0}.";
+    private static final String NOT_FOUND = "Entity not found, {0}.";
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    ResponseEntity onEntityNotFoundException(final EntityNotFoundException e)
+    {
+        log.warn(NOT_FOUND, e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AbstractMap.SimpleEntry<>(ERROR_KEY, e.getMessage()));
+    }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

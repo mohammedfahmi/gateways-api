@@ -188,8 +188,8 @@
                         <exclude>**/gatewaysapi/repositories/*</exclude>
                         <exclude>**/gatewaysapi/models/*</exclude>
                         <exclude>**/gatewaysapi/entities/*</exclude>
-                        <exclude>**/gatewaysapi/controllers/ErrorHandlingControllerAdvice.java</exclude>
-                        <exclude>**/gatewaysapi/GatewaysApiApplication.java</exclude>
+                        <exclude>**/gatewaysapi/controllers/ErrorHandlingControllerAdvice.class</exclude>
+                        <exclude>**/gatewaysapi/GatewaysApiApplication.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -282,10 +282,6 @@
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
-<!--                                    <excludes>-->
-<!--                                        <exclude>*Test</exclude>-->
-<!--                                        <exclude>*IT</exclude>-->
-<!--                                    </excludes>-->
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>

@@ -1,10 +1,14 @@
 package com.musala.gatewaysapi.entities;
 
 import com.musala.gatewaysapi.models.AbstractGateway;
+import com.musala.gatewaysapi.models.GatewayModel;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.EMPTY_LIST;
 
 @Getter
 @Setter
@@ -34,8 +38,20 @@ public class Gateway {
 
     public AbstractGateway getAbstractGatewayFromGateway() {
         return AbstractGateway.builder()
-                .gatewayUuid(this.getGatewayUuid())
-                .gatewayName(this.getGatewayName())
-                .gatewayIpv4(this.getGatewayIpv4()).build();
+                        .gatewayUuid(this.getGatewayUuid() == null ? "": this.getGatewayUuid())
+                        .gatewayName(this.getGatewayName() == null ? "": this.getGatewayName())
+                        .gatewayIpv4(this.getGatewayIpv4() == null ? "": this.getGatewayIpv4())
+                        .build();
+
+    }
+    public GatewayModel getGatewayModelFromGateway() {
+        return GatewayModel.builder()
+                        .gatewayUuid(this.getGatewayUuid() == null ? "": this.getGatewayUuid())
+                        .gatewayName(this.getGatewayName() == null ? "": this.getGatewayName())
+                        .gatewayIpv4(this.getGatewayIpv4() == null ? "": this.getGatewayIpv4())
+                        .devices(this.getDevices() == null ? EMPTY_LIST :
+                                this.getDevices().stream().map(Device::getDeviceModelFromDevice).collect(Collectors.toList()))
+                        .build();
+
     }
 }

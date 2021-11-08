@@ -40,44 +40,49 @@ public class TestRestTemplate {
     public static Boolean testCall() {
         AbstractGateway[] response;
         try {
-            response =  restTemplate.exchange(DATA_CHECK_URL,HttpMethod.GET,new HttpEntity<>(createHttpHeaders()), AbstractGateway[].class).getBody();
+            response =  restTemplate.exchange(DATA_CHECK_URL,HttpMethod.GET,new HttpEntity<>(createHttpHeaders(true)), AbstractGateway[].class).getBody();
             assert response != null;
         } catch (Exception e) {
             return false;
         }
         return response.length > 0;
     }
-    public static <T> ResponseEntity<?> restCall(final String uri, final HttpMethod method, final Map<String,String> queryParameters, final Class<?> responseType, final T requestBody) {
+    public static <T> ResponseEntity<?> restCall(final String uri, final HttpMethod method, final Map<String,String> queryParameters,
+                                                 final Class<?> responseType, final T requestBody, final Boolean withAuth, String... uriVariables) {
         switch (method) {
             case GET:
-                return doGet(uri, queryParameters, responseType);
+                return doGet(uri, queryParameters, responseType, withAuth, uriVariables);
             case POST:
-                return doPost(uri, queryParameters, requestBody, responseType);
+                return doPost(uri, queryParameters, requestBody, responseType, withAuth, uriVariables);
             case PUT:
-                return doPut(uri, queryParameters, requestBody, responseType);
+                return doPut(uri, queryParameters, requestBody, responseType, withAuth, uriVariables);
             default:
-                return doDelete(uri, queryParameters, requestBody, responseType);
+                return doDelete(uri, queryParameters, requestBody, responseType, withAuth, uriVariables);
         }
     }
 
-    private static <T> ResponseEntity<?> doGet(final String uri, final Map<String,String> queryParameters, final Class<?> responseType) {
-        final HttpEntity<T> headers = new HttpEntity<>(createHttpHeaders());
-        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.GET,headers,responseType);
+    private static <T> ResponseEntity<?> doGet(final String uri, final Map<String,String> queryParameters,
+                                               final Class<?> responseType, final Boolean withAuth, String... uriVariables) {
+        final HttpEntity<T> headers = new HttpEntity<>(createHttpHeaders(withAuth));
+        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.GET,headers,responseType, (Object[]) uriVariables);
     }
 
-    private static <T> ResponseEntity<?> doPost(final String uri, final Map<String,String> queryParameters, final T requestBody, final Class<?> responseType) {
-        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders());
-        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.POST,requestEntity,responseType);
+    private static <T> ResponseEntity<?> doPost(final String uri, final Map<String,String> queryParameters,
+                                                final T requestBody, final Class<?> responseType, final Boolean withAuth, String... uriVariables) {
+        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(withAuth));
+        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.POST,requestEntity,responseType, (Object[]) uriVariables);
     }
 
-    private static <T> ResponseEntity<?> doPut(final String uri, final Map<String,String> queryParameters, final T requestBody, final Class<?> responseType) {
-        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders());
-        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.PUT,requestEntity,responseType);
+    private static <T> ResponseEntity<?> doPut(final String uri, final Map<String,String> queryParameters,
+                                               final T requestBody, final Class<?> responseType, final Boolean withAuth, String... uriVariables) {
+        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(withAuth));
+        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.PUT,requestEntity,responseType, (Object[]) uriVariables);
     }
 
-    private static <T> ResponseEntity<?> doDelete(final String uri, final Map<String,String> queryParameters, final T requestBody, final Class<?> responseType) {
-        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders());
-        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.DELETE,requestEntity,responseType);
+    private static <T> ResponseEntity<?> doDelete(final String uri, final Map<String,String> queryParameters,
+                                                  final T requestBody, final Class<?> responseType, final Boolean withAuth, String... uriVariables) {
+        final HttpEntity<T> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(withAuth));
+        return restTemplate.exchange(uriBuilder(uri,queryParameters),HttpMethod.DELETE,requestEntity,responseType, (Object[]) uriVariables);
     }
 
     private static String uriBuilder(final String URI) {
@@ -97,15 +102,17 @@ public class TestRestTemplate {
         return baseOfURI.append(params).toString();
     }
 
-    private static HttpHeaders createHttpHeaders() {
-        final String notEncoded = NAME + ":" + PASSWORD;
-        final String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(notEncoded.getBytes());
+    private static HttpHeaders createHttpHeaders(Boolean withAuth) {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Authorization", encodedAuth);
+        if(withAuth) {
+            final String notEncoded = NAME + ":" + PASSWORD;
+            final String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(notEncoded.getBytes());
+            headers.add("Authorization", encodedAuth);
+        }
         return headers;
     }
-    public static Map<String, String> prepareQueryParams(String... keyValuePairs) {
+    public static Map<String, String> prepareParams(String... keyValuePairs) {
         ArrayList<String> keyValuePairList = new ArrayList<>(Arrays.asList(keyValuePairs));
         Assert.isTrue(isEven(keyValuePairList.size()), "[Assertion failed] - keyValuePairs length must be even");
         Map<String, String> queryParams = new HashMap<>();

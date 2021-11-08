@@ -22,6 +22,7 @@ management:
   endpoint:
     httptrace:
       enabled: true
+
     health:
       enabled: true
     info:

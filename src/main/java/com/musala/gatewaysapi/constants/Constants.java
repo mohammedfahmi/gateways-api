@@ -7,4 +7,7 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class Constants {
+    public static final String IPV4_PATTERN = "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$";
+    public static final String GATEWAY_NOT_FOUND_ERROR_MESSAGE = "Requested Gateway with uuid {0} is not Found";
+
 }

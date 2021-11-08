@@ -12,15 +12,16 @@ import java.lang.annotation.Target;
 import java.text.MessageFormat;
 import javax.validation.*;
 
-import static com.musala.gatewaysapi.validations.ValidationErrorMessages.REQUESTED_DEFAULT_PAGE_NOT_AVAILABLE;
+import static com.musala.gatewaysapi.validations.ValidationErrorMessages.DEFAULT_REQUESTED_PAGE_NOT_AVAILABLE;
 import static com.musala.gatewaysapi.validations.ValidationErrorMessages.REQUESTED_PAGE_NOT_AVAILABLE;
+import static com.musala.gatewaysapi.validations.ValidationUtil.customViolationTemplateGeneration;
 
 @SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Constraint(validatedBy = PageIsValidImpl.class)
 public @interface PageIsValid {
-    String message() default REQUESTED_DEFAULT_PAGE_NOT_AVAILABLE;
+    String message() default DEFAULT_REQUESTED_PAGE_NOT_AVAILABLE;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
@@ -30,14 +31,15 @@ public @interface PageIsValid {
 class PageIsValidImpl
         implements ConstraintValidator<PageIsValid, GatewayPaginationRequest> {
     private final GatewayService gatewayService;
-    private final ValidationUtil validationUtil = new ValidationUtil();
     @Override
-    public void initialize(final PageIsValid page) {/*  Nothing to initialize: Just validating the page number against the DB */}
+    public void initialize(final PageIsValid page) {
+        ConstraintValidator.super.initialize(page);
+    }
     @Override
     public boolean isValid(final GatewayPaginationRequest request, final ConstraintValidatorContext constraintValidatorContext) {
         int gatewaysCount = gatewayService.getAllGatewaysCount();
         if(isGatewayCountLessThanPageFirstItem(gatewaysCount, request) || isGatewaysCountZeroAndPageIsNot(gatewaysCount, request.getPage())) {
-            validationUtil.customViolationTemplateGeneration(
+            customViolationTemplateGeneration(
                     MessageFormat.format(REQUESTED_PAGE_NOT_AVAILABLE, request.getPage()),constraintValidatorContext);
             return false;
         }

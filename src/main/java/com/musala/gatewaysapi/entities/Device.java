@@ -1,9 +1,12 @@
 package com.musala.gatewaysapi.entities;
 
+import com.musala.gatewaysapi.models.DeviceModel;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Setter
 @Getter
@@ -28,8 +31,18 @@ public class Device {
     private String vendor;
 
     @Column(name = "device_creation_date", nullable = false)
-    private Instant deviceCreationDate;
+    private LocalDateTime deviceCreationDate;
 
     @Column(name = "status", nullable = false)
     private Boolean status = false;
+
+    public DeviceModel getDeviceModelFromDevice() {
+        return DeviceModel.builder()
+                        .devicesUuid(this.devicesUuid == null ? "": this.devicesUuid)
+                        .devicesName(this.devicesName == null ? "": this.devicesName)
+                        .vendor(this.vendor == null ? "": this.vendor)
+                        .deviceCreationDate(this.deviceCreationDate == null ? LocalDateTime.MIN: this.deviceCreationDate)
+                        .status(this.status == null ? false: this.status)
+                        .build();
+    }
 }

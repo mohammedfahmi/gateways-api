@@ -1,5 +1,7 @@
 package com.musala.gatewaysapi.validations;
 
+import com.google.gson.Gson;
+import com.musala.gatewaysapi.models.BindingError;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -8,14 +10,18 @@ import org.springframework.validation.BindingResult;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.musala.gatewaysapi.constants.Constants.IPV4_PATTERN;
+
 @Slf4j
 @Component
 @NoArgsConstructor
 public class ValidationUtil {
-
-    public void customViolationTemplateGeneration (
+    private static Gson gson = new Gson();
+    public static void customViolationTemplateGeneration (
             @NonNull final String message,
             @NonNull final ConstraintValidatorContext constraintValidatorContext
     ) {
@@ -23,21 +29,24 @@ public class ValidationUtil {
         constraintValidatorContext.buildConstraintViolationWithTemplate(message).addConstraintViolation();
     }
 
-    public void handleBindResult(BindingResult result) {
+    public static void handleBindResult(BindingResult result) {
         if (result.getAllErrors().size() == 0)
             return;
-        StringBuilder bindingErrors = new StringBuilder();
-        StringBuilder validationFailedMessages = new StringBuilder();
+        StringJoiner validationFailedMessages = new StringJoiner(", ");
         result.getAllErrors().forEach(
                 objectError -> {
-                    Objects.requireNonNull(objectError.getCodes());
-                    int errorCode = objectError.getCodes().length -1;
-                    final String[] codes = objectError.getCodes();
-                    validationFailedMessages.append(codes[errorCode]);
-                    bindingErrors.append(Arrays.deepToString(codes));
+                    BindingError error = gson.fromJson(gson.toJson(objectError), BindingError.class);
+                    log.info(error.toString());
+                    validationFailedMessages.add(error.toString());
+
                 }
         );
-        log.info("Binding Failed after Failed Validation; Binding Exception: {}", bindingErrors);
         throw new ValidationException(validationFailedMessages.toString());
+    }
+
+    public static Boolean isMatchingPattern (String regx, String value) {
+        Pattern pattern = Pattern.compile(regx);
+        Matcher matcher = pattern.matcher(value);
+        return matcher.matches();
     }
 }

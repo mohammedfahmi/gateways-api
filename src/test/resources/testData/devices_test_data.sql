@@ -103,9 +103,5 @@ values
     (101,'a3e3f281-3c2d-11ec-a662-0242ac160003','devices-a3e3f291-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,52),
     (102,'a3e3f6cf-3c2d-11ec-a662-0242ac160003','devices-a3e3f6ec-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,53),
     (103,'a3e40b67-3c2d-11ec-a662-0242ac160003','devices-a3e40b96-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,54),
-    (104,'a3e410f7-3c2d-11ec-a662-0242ac160003','devices-a3e4110d-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,55),
-    (105,'a3e414f7-3c2d-11ec-a662-0242ac160003','devices-a3e41509-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,56),
-    (106,'a3e41905-3c2d-11ec-a662-0242ac160003','devices-a3e41916-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,57),
-    (107,'a3e41cc9-3c2d-11ec-a662-0242ac160003','devices-a3e41cdc-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,58),
-    (108,'a3e42214-3c2d-11ec-a662-0242ac160003','devices-a3e4222b-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,59)
+    (104,'a3e410f7-3c2d-11ec-a662-0242ac160003','devices-a3e4110d-3c2d-11ec-a662-0242ac160003','texas tech','2021-11-02 22:38:46',true,55)
 ;

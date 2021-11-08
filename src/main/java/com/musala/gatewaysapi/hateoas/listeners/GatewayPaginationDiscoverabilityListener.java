@@ -9,8 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.StringJoiner;
 
-import static com.musala.gatewaysapi.constants.ApiMapping.API_ROOT;
-import static com.musala.gatewaysapi.constants.ApiMapping.GET_ALL_GATEWAYS;
+import static com.musala.gatewaysapi.hateoas.listeners.ListenerUtil.createLinkHeader;
 
 @NoArgsConstructor
 @Component
@@ -22,8 +21,6 @@ public class GatewayPaginationDiscoverabilityListener
     @Override
     public void onApplicationEvent(PaginatedResultsEvent paginatedResultsEvent) {
         final UriComponentsBuilder uriBuilder = paginatedResultsEvent.getUriBuilder();
-        uriBuilder.path(API_ROOT+GET_ALL_GATEWAYS);
-
         StringJoiner linkHeader = new StringJoiner(", ");
         if(hasFirstPage(paginatedResultsEvent.getPage()))
             linkHeader.add(getFirstPageLink(uriBuilder, paginatedResultsEvent));
@@ -81,9 +78,5 @@ public class GatewayPaginationDiscoverabilityListener
 
     final boolean hasLastPage(final int page, final int totalPages) {
         return (totalPages > 1) && hasNextPage(page, totalPages);
-    }
-
-    public static String createLinkHeader(final String uri, final String rel) {
-        return "<" + uri + ">; rel=\"" + rel + "\"";
     }
 }
