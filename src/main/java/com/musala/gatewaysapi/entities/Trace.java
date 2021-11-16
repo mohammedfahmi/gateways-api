@@ -5,7 +5,6 @@ import lombok.*;
 import org.springframework.boot.actuate.trace.http.HttpTrace;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Setter

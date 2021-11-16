@@ -17,6 +17,7 @@ import static com.musala.gatewaysapi.validations.ValidationErrorMessages.*;
 import static com.musala.gatewaysapi.validations.ValidationUtil.customViolationTemplateGeneration;
 import static java.lang.annotation.ElementType.*;
 
+@SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
 @Target({TYPE, FIELD, PARAMETER})
 @Constraint(validatedBy = IsUuidImpl.class)
@@ -34,6 +35,7 @@ class IsUuidImpl
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public boolean isValid(String uuid, ConstraintValidatorContext constraintValidatorContext) {
         try {

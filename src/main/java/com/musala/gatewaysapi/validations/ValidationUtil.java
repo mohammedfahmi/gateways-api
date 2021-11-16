@@ -1,7 +1,9 @@
 package com.musala.gatewaysapi.validations;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.musala.gatewaysapi.models.BindingError;
+import com.musala.gatewaysapi.utils.LocalDateTimeAdapter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -10,6 +12,7 @@ import org.springframework.validation.BindingResult;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ValidationException;
+import java.time.LocalDateTime;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +21,7 @@ import java.util.regex.Pattern;
 @Component
 @NoArgsConstructor
 public class ValidationUtil {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     public static void customViolationTemplateGeneration (
             @NonNull final String message,

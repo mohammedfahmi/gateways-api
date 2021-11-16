@@ -1,7 +1,6 @@
 package com.musala.gatewaysapi.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -9,6 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @Component
 public class BindingError {
     private String field;

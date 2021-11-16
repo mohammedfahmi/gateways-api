@@ -1,24 +1,22 @@
 package com.musala.gatewaysapi.configuration;
 
-//import io.swagger.v3.oas.models.ExternalDocumentation;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import org.springframework.context.annotation.Bean;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@SecurityScheme(
+        name = "basicAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "basic"
+)
+@OpenAPIDefinition(
+        info = @Info(title = "gateways-api", version = "v1.0.0", description = "a private microservice that serves as gateways and devices"),
+        security = @SecurityRequirement(name = "basicAuth")
+)
 public class SwaggerConfiguration {
-    @Bean
-    public OpenAPI gatewaysApiOpenAPI() {
-        return new OpenAPI()
-                .info(new Info().title("gateways-api")
-                        .description("a private microservice that serves as gateways and devices")
-                        .version("v2.3.0")
-                        .license(new License()))
-                /*.externalDocs(new ExternalDocumentation()
-                        .description("see more details here {gateway-api Confluence Documentation}")
-                        .url("readme link"))*/;
-    }
 }
 

@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @Getter
 public class GetResultEvent extends ApplicationEvent {
-    private HttpServletResponse response;
-    private UriComponentsBuilder uriBuilder;
-    private Integer totalEntityCount;
+    private final HttpServletResponse response;
+    private final UriComponentsBuilder uriBuilder;
+    private final Integer totalEntityCount;
 
     public GetResultEvent(Object source, UriComponentsBuilder  uriBuilder, HttpServletResponse response, Integer totalEntityCount ) {
         super(source);

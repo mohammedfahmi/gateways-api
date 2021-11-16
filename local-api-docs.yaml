@@ -1,0 +1,614 @@
+openapi: 3.0.1
+info:
+  title: gateways-api
+  description: a private microservice that serves as gateways and devices
+  version: v1.0.0
+servers:
+- url: http://localhost:8080/gateways-api
+  description: Generated server url
+security:
+- basicAuth: []
+paths:
+  /api/rest/{gateway_uuid}/device/{device_uuid}:
+    get:
+      tags:
+      - getDevice
+      summary: get a gateway's device
+      operationId: getDevice
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: device_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad device_uuid, not in uuid format.:
+                  description: "An example Response to a bad device_uuid, not in uuid\
+                    \ format."
+                  value:
+                    error: "Validation failed, getDevice.gateway_uuid: Requested uuid\
+                      \ q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to device_uuid not found.:
+                  description: An example Response to device_uuid not found.
+                  value:
+                    error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "200":
+          description: successfully retrieved a single Device entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceModel'
+              examples:
+                An example Response to getDevice endpoint.:
+                  description: An example Response to getDevice endpoint.
+                  value:
+                    devicesUuid: ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                    devicesName: Device-3ebae3e5-bd64-4c8e-8370-48f96717e9e8
+                    vendor: texas tech
+                    deviceCreationDate: 2021-11-16T03:08:32.258
+                    status: true
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+    put:
+      tags:
+      - updateDevice
+      summary: update a Device details
+      operationId: updateDevice
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: device_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceModel'
+        required: true
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad device_uuid, not in uuid format.:
+                  description: "An example Response to a bad device_uuid, not in uuid\
+                    \ format."
+                  value:
+                    error: "Validation failed, updateDevice.gateway_uuid: Requested\
+                      \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to device_uuid not found.:
+                  description: An example Response to device_uuid not found.
+                  value:
+                    error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "200":
+          description: Gateway's Device updated successfully
+          content:
+            application/json:
+              examples:
+                An example Response to updateDevice endpoint.:
+                  description: An example Response to updateDevice endpoint.
+                  value:
+                    message: Gateway's Device updated successfully
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:53:05.949+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+    delete:
+      tags:
+      - deleteDevice
+      summary: delete a Device details
+      operationId: deleteDevice
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: device_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad device_uuid, not in uuid format.:
+                  description: "An example Response to a bad device_uuid, not in uuid\
+                    \ format."
+                  value:
+                    error: "Validation failed, deleteDevice.gateway_uuid: Requested\
+                      \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to device_uuid not found.:
+                  description: An example Response to device_uuid not found.
+                  value:
+                    error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:53:05.949+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+        "200":
+          description: Gateway's Device deleted successfully
+          content:
+            application/json:
+              examples:
+                An example Response to deleteDevice endpoint.:
+                  description: An example Response to deleteDevice endpoint.
+                  value:
+                    message: Gateway's Device deleted successfully
+  /api/rest/gateway/{gateway_uuid}:
+    get:
+      tags:
+      - getGateway
+      summary: get a single Gateway resource
+      operationId: getGateway
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad gateway_uuid, not in uuid format.:
+                  description: "An example Response to a bad gateway_uuid, not in\
+                    \ uuid format."
+                  value:
+                    error: "Validation failed, getGateway.gateway_uuid: Requested\
+                      \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to gateway_uuid not found.:
+                  description: An example Response to gateway_uuid not found.
+                  value:
+                    error: Requested Gateway with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "200":
+          description: successfully retrieved a single Gateway resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayModel'
+              examples:
+                An example Response to getGatewayPage endpoint.:
+                  description: An example Response to getGatewayPage endpoint.
+                  value:
+                    gatewayUuid: a3c23161-3c2d-11ec-a662-0242ac160003
+                    gatewayName: gateway-a3c2316a-3c2d-11ec-a662-0242ac160003
+                    gatewayIpv4: 70.22.2.45
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+    put:
+      tags:
+      - updateGateway
+      summary: Update Gateway details
+      operationId: updateGateway
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AbstractGateway'
+        required: true
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad gateway_uuid, not in uuid format.:
+                  description: "An example Response to a bad gateway_uuid, not in\
+                    \ uuid format."
+                  value:
+                    error: "Validation failed, updateGateway.gateway_uuid: Requested\
+                      \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to gateway_uuid not found.:
+                  description: An example Response to gateway_uuid not found.
+                  value:
+                    error: Requested Gateway with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+        "200":
+          description: successfully updated a single Gateway entity
+          content:
+            application/json:
+              examples:
+                An example Response to updateGateway endpoint.:
+                  description: An example Response to updateGateway endpoint.
+                  value:
+                    message: Gateway updated successfully
+  /api/rest/{gateway_uuid}/device:
+    post:
+      tags:
+      - createDevice
+      summary: create a Device
+      operationId: createDevice
+      parameters:
+      - name: gateway_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceModel'
+        required: true
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad device_uuid, not in uuid format.:
+                  description: "An example Response to a bad device_uuid, not in uuid\
+                    \ format."
+                  value:
+                    error: "Validation failed, createDevice.gateway_uuid: Requested\
+                      \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Requested resource is not found
+          content:
+            application/json:
+              examples:
+                An example Response to device_uuid not found.:
+                  description: An example Response to device_uuid not found.
+                  value:
+                    error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+                      is not Found
+        "200":
+          description: Device created successfully and added to requested gateway
+            device list
+          content:
+            application/json:
+              examples:
+                An example Response to createDevice endpoint.:
+                  description: An example Response to createDevice endpoint.
+                  value:
+                    message: Device created successfully and added to requested gateway
+                      device list
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:46:17.164+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device
+  /api/rest/gateway:
+    post:
+      tags:
+      - createGateway
+      summary: create a Gateway
+      operationId: createGateway
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AbstractGateway'
+        required: true
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad request body.:
+                  description: An example Response to a bad request body.
+                  value:
+                    error: "Validation failed, failed to bind value null to field\
+                      \ gatewayUuid, failed to bind value null to field gatewayIpv4,\
+                      \ failed to bind value null to field gatewayName."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: successfully created Gateway entity
+          content:
+            application/json:
+              examples:
+                An example Response to createGateway endpoint.:
+                  description: An example Response to createGateway endpoint.
+                  value:
+                    message: Gateway created successfully
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+  /api/rest/gateways:
+    get:
+      tags:
+      - getGatewayPage
+      summary: get a page of Gateways
+      operationId: getGatewayPage
+      parameters:
+      - name: gatewayPaginationRequest
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/GatewayPaginationRequest'
+      responses:
+        "400":
+          description: "bad request, not valid parameter"
+          content:
+            application/json:
+              examples:
+                An example Response to a bad page and bad size values.:
+                  description: An example Response to a bad page and bad size values.
+                  value:
+                    error: "Validation failed, failed to bind value four to field\
+                      \ page, failed to bind value ten to field size."
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: successfully retrieved a single page of Gateways
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AbstractGateway'
+              examples:
+                An example Response to getGatewayPage endpoint.:
+                  description: An example Response to getGatewayPage endpoint.
+                  value:
+                  - gatewayUuid: a3c23161-3c2d-11ec-a662-0242ac160003
+                    gatewayName: gateway-a3c2316a-3c2d-11ec-a662-0242ac160003
+                    gatewayIpv4: 70.22.2.45
+                  - gatewayUuid: a3c231e0-3c2d-11ec-a662-0242ac160003
+                    gatewayName: gateway-a3c231e8-3c2d-11ec-a662-0242ac160003
+                    gatewayIpv4: 17.50.0.52
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/gateways
+components:
+  schemas:
+    DeviceModel:
+      type: object
+      properties:
+        devicesUuid:
+          type: string
+        devicesName:
+          type: string
+        vendor:
+          type: string
+        deviceCreationDate:
+          type: string
+          format: date-time
+        status:
+          type: boolean
+    AbstractGateway:
+      type: object
+      properties:
+        gatewayUuid:
+          type: string
+        gatewayName:
+          type: string
+        gatewayIpv4:
+          type: string
+    GatewayPaginationRequest:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+    GatewayModel:
+      type: object
+      properties:
+        gatewayUuid:
+          type: string
+        gatewayName:
+          type: string
+        gatewayIpv4:
+          type: string
+        devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceModel'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

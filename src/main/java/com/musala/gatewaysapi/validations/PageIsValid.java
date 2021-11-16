@@ -37,18 +37,21 @@ class PageIsValidImpl
     }
     @Override
     public boolean isValid(final GatewayPaginationRequest request, final ConstraintValidatorContext constraintValidatorContext) {
+        String pageNotValid = MessageFormat.format(REQUESTED_PAGE_NOT_AVAILABLE, request.getPage());
         int gatewaysCount = gatewayService.getAllGatewaysCount();
-        if(isGatewayCountLessThanPageFirstItem(gatewaysCount, request) || isGatewaysCountZeroAndPageIsNot(gatewaysCount, request.getPage())) {
-            customViolationTemplateGeneration(
-                    MessageFormat.format(REQUESTED_PAGE_NOT_AVAILABLE, request.getPage()),constraintValidatorContext);
+        if(isPageNotValid(gatewaysCount, request.getPage(), request.getSize())) {
+            customViolationTemplateGeneration(pageNotValid, constraintValidatorContext);
             return false;
         }
         return true;
     }
-    private boolean isGatewayCountLessThanPageFirstItem(int gatewaysCount, GatewayPaginationRequest request) {
-        return request.getSize() * request.getPage() + 1 > gatewaysCount;
+    private boolean isPageNotValid(int gatewaysCount, int page, int size) {
+        return isGatewaysCountZeroAndPageIsNot(gatewaysCount, page) || isGatewayCountLessThanPageFirstItem(gatewaysCount, page, size);
     }
     private boolean isGatewaysCountZeroAndPageIsNot(int gatewaysCount, int page) {
         return gatewaysCount == 0 && page > 0;
+    }
+    private boolean isGatewayCountLessThanPageFirstItem(int gatewaysCount, int page, int size) {
+        return page > 0 ? (size * page + 1 > gatewaysCount) : (page != 0) ;
     }
 }

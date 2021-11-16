@@ -9,11 +9,13 @@ import org.springframework.validation.Validator;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.musala.gatewaysapi.validations.ValidationErrorMessages.*;
 import static java.time.ZoneOffset.UTC;
 
+@SuppressWarnings("NullableProblems")
 @Slf4j
 @Component
 public class DeviceModelValidator implements Validator {
@@ -22,6 +24,7 @@ public class DeviceModelValidator implements Validator {
         return DeviceModel.class.equals(clazz);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void validate(Object target, Errors errors) {
         DeviceModel requestBody = (DeviceModel) target;
@@ -30,7 +33,7 @@ public class DeviceModelValidator implements Validator {
             Assert.hasText(requestBody.getDevicesUuid(), DEFAULT_REQUESTED_DEVICE_UUID_IS_NOT_VALID);
             UUID.fromString(requestBody.getDevicesUuid());
         } catch (IllegalArgumentException  exception) {
-            String logMessage = (requestBody.getDevicesUuid() != null && requestBody.getDevicesUuid() != "") ?
+            String logMessage = (requestBody.getDevicesUuid() != null && !Objects.equals(requestBody.getDevicesUuid(), "")) ?
                     MessageFormat.format(REQUESTED_DEVICE_UUID_IS_NOT_VALID, requestBody.getDevicesUuid()) :
                     DEFAULT_REQUESTED_DEVICE_UUID_IS_NOT_VALID;
             log.error( logMessage, exception);
@@ -40,7 +43,7 @@ public class DeviceModelValidator implements Validator {
             Assert.notNull(requestBody.getDevicesName(), DEFAULT_REQUESTED_DEVICE_NAME_IS_NOT_VALID);
             Assert.hasText(requestBody.getDevicesName(), DEFAULT_REQUESTED_DEVICE_NAME_IS_NOT_VALID);
         } catch (IllegalArgumentException  exception) {
-            String logMessage = (requestBody.getDevicesName() != null && requestBody.getDevicesName() != "") ?
+            String logMessage = (requestBody.getDevicesName() != null && !Objects.equals(requestBody.getDevicesName(), "")) ?
                     MessageFormat.format(REQUESTED_DEVICE_NAME_IS_NOT_VALID, requestBody.getDevicesName()) :
                     DEFAULT_REQUESTED_DEVICE_NAME_IS_NOT_VALID;
             log.error( logMessage, exception);
@@ -50,25 +53,20 @@ public class DeviceModelValidator implements Validator {
             Assert.notNull(requestBody.getVendor(), DEFAULT_REQUESTED_DEVICE_VENDOR_IS_NOT_VALID);
             Assert.hasText(requestBody.getVendor(), DEFAULT_REQUESTED_DEVICE_VENDOR_IS_NOT_VALID);
         } catch (IllegalArgumentException  exception) {
-            String logMessage = (requestBody.getVendor() != null && requestBody.getVendor() != "") ?
+            String logMessage = (requestBody.getVendor() != null && !Objects.equals(requestBody.getVendor(), "")) ?
                     MessageFormat.format(REQUESTED_DEVICE_VENDOR_IS_NOT_VALID, requestBody.getVendor()) :
                     DEFAULT_REQUESTED_DEVICE_VENDOR_IS_NOT_VALID;
             log.error( logMessage, exception);
             errors.rejectValue("vendor", logMessage);
         }
         try {
-            Assert.notNull(requestBody.getStatus(), DEFAULT_REQUESTED_DEVICE_STATUS_IS_NOT_VALID);
-        } catch (IllegalArgumentException  exception) {
-            log.error( DEFAULT_REQUESTED_DEVICE_STATUS_IS_NOT_VALID, exception);
-            errors.rejectValue("status", DEFAULT_REQUESTED_DEVICE_STATUS_IS_NOT_VALID);
-        }
-        try {
             Assert.notNull(requestBody.getDeviceCreationDate(), DEFAULT_REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID);
+            Assert.isTrue(requestBody.getDeviceCreationDate().getYear() > 0, DEFAULT_REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID);
             Assert.isTrue(LocalDateTime.now(UTC)
                     .isAfter( requestBody.getDeviceCreationDate()),DEFAULT_REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID);
         } catch (IllegalArgumentException  exception) {
-            String logMessage = (requestBody.getDeviceCreationDate() != null ) ?
-                    MessageFormat.format(REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID, requestBody.getVendor()) :
+            String logMessage = (requestBody.getDeviceCreationDate() != null &&  requestBody.getDeviceCreationDate().getYear() > 0) ?
+                    MessageFormat.format(REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID, requestBody.getDeviceCreationDate()) :
                     DEFAULT_REQUESTED_DEVICE_CREATION_DATE_IS_NOT_VALID;
             log.error( logMessage, exception);
             errors.rejectValue("deviceCreationDate", logMessage);

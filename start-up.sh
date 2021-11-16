@@ -1,1 +1,1 @@
-docker-compose up -d
+docker-compose up --detach --no-build

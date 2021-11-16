@@ -5,14 +5,17 @@ import com.musala.gatewaysapi.models.GatewayModel;
 import lombok.*;
 
 import javax.persistence.*;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.musala.gatewaysapi.constants.Constants.DEVICE_NOT_FOUND_ERROR_MESSAGE;
 import static java.util.Collections.EMPTY_LIST;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder=true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "gateways")
@@ -43,6 +46,7 @@ public class Gateway {
                         .build();
 
     }
+    @SuppressWarnings("unchecked")
     public GatewayModel getGatewayModelFromGateway() {
         return GatewayModel.builder()
                         .gatewayUuid(this.getGatewayUuid() == null ? "": this.getGatewayUuid())
@@ -52,5 +56,15 @@ public class Gateway {
                                 this.getDevices().stream().map(Device::getDeviceModelFromDevice).collect(Collectors.toList()))
                         .build();
 
+    }
+
+    public Device getDeviceFromGatewayByUuid(String deviceUuid) {
+        String notFoundErrorMessage = MessageFormat.format(DEVICE_NOT_FOUND_ERROR_MESSAGE, deviceUuid);
+        if(!Optional.ofNullable(this.getDevices()).isPresent())
+            throw new EntityNotFoundException(notFoundErrorMessage);
+        List<Device> devices = this.getDevices().stream().filter(device -> device.getDevicesUuid().equals(deviceUuid)).collect(Collectors.toList());
+        if(devices.isEmpty())
+            throw new EntityNotFoundException(notFoundErrorMessage);
+        return devices.get(0);
     }
 }

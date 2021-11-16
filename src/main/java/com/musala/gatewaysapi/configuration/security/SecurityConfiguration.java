@@ -17,15 +17,13 @@ import javax.annotation.Nonnull;
 /**
  * Configuration class for web security
  */
-@SuppressWarnings("ConfigurationProperties")
 @Configuration
 @EnableWebSecurity
 @Setter
 @Getter
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "endpoint.security.user")
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter
-{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String REQUEST_WILDCARD = "/**";
     private String name;
     private String password;
@@ -40,10 +38,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         web.ignoring().antMatchers(managementContext + REQUEST_WILDCARD);
     }
 
-
     @Override
-    protected void configure(@Nonnull final AuthenticationManagerBuilder authenticationBuilder) throws Exception
-    {
+    protected void configure(@Nonnull final AuthenticationManagerBuilder authenticationBuilder) throws Exception {
         authenticationBuilder
                 .inMemoryAuthentication()
                 .withUser(name)
@@ -52,8 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     }
 
     @Override
-    protected void configure(@Nonnull final HttpSecurity http) throws Exception
-    {
+    protected void configure(@Nonnull final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
                 .anyRequest().hasRole(role)

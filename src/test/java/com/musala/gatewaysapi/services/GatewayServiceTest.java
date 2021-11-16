@@ -61,6 +61,7 @@ class GatewayServiceTest {
         when(gatewayRepository.getAllGatewaysCount()).thenReturn(55);
         assertEquals(gatewayService.getAllGatewaysCount(), 55);
     }
+    @SuppressWarnings("SimplifyStreamApiCallChains")
     @Test
     void getGateways_Page4_Size10_Successfully() {
         StringBuilder expectedResponse = new StringBuilder();

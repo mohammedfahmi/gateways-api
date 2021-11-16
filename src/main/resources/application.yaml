@@ -2,7 +2,7 @@ server:
   servlet:
     context-path: /gateways-api
 springdoc:
-  packages-to-scan: com.musala.gatewaysapi.controller
+  packages-to-scan: com.musala.gatewaysapi.controllers
   paths-to-match: /api/rest/**
   swagger-ui:
     path: /swagger-ui.html

@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 @Getter
 public class SaveResultEvent extends ApplicationEvent {
-    private HttpServletResponse response;
-    private UriComponentsBuilder uriBuilder;
+    private final HttpServletResponse response;
+    private final UriComponentsBuilder uriBuilder;
 
     public SaveResultEvent(Object source, UriComponentsBuilder  uriBuilder, HttpServletResponse response) {
         super(source);

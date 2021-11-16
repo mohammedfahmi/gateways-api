@@ -7,12 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
-import java.text.MessageFormat;
-import java.util.Optional;
-
-import static com.musala.gatewaysapi.constants.Constants.DEVICE_NOT_FOUND_ERROR_MESSAGE;
 
 @Slf4j
 @AllArgsConstructor
@@ -23,15 +18,8 @@ public class DeviceService {
     private DiscoveryService discoveryService;
     private GatewayService gatewayService;
 
-    public Device getDeviceByUuid(String deviceUuid) {
-        Optional<Device> result = Optional.ofNullable(deviceRepository.findDeviceByDevicesUuidEquals(deviceUuid));
-        if(result.isPresent())
-            return result.get();
-        throw new EntityNotFoundException(MessageFormat.format(DEVICE_NOT_FOUND_ERROR_MESSAGE, deviceUuid));
-    }
-
     public Device getDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String gatewayUuid, String deviceUuid) {
-        Device device = getDeviceByUuid(deviceUuid);
+        Device device  = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
         discoveryService.triggerGetDeviceEntityDiscovery(uriBuilder, response, gatewayUuid);
         return device;
     }
@@ -44,7 +32,7 @@ public class DeviceService {
     }
 
     public Device updateDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String deviceUuid, String gatewayUuid, Device newDevice) {
-        Device oldDevice = getDeviceByUuid(deviceUuid);
+        Device oldDevice = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
         Device device = Device.builder()
                 .id(oldDevice.getId())
                 .devicesUuid(newDevice.getDevicesUuid())
@@ -59,7 +47,7 @@ public class DeviceService {
     }
 
     public void deleteDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String deviceUuid, String gatewayUuid) {
-        Device device = getDeviceByUuid(deviceUuid);
+        Device device = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
         deviceRepository.delete(device);
         discoveryService.triggerDeleteDeviceEntityDiscovery(uriBuilder, response, gatewayUuid);
         deviceRepository.flush();

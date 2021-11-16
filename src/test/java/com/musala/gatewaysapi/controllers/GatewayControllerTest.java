@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @Slf4j
 class GatewayControllerTest {
+
     @Autowired
     private SecurityConfiguration securityConfiguration;
     @Autowired
@@ -54,6 +55,7 @@ class GatewayControllerTest {
     @MockBean
     private GatewayService gatewayService;
 
+    @SuppressWarnings("InstantiationOfUtilityClass")
     @TestConfiguration
     static class AdditionalConfig {
         @Bean
@@ -65,6 +67,8 @@ class GatewayControllerTest {
             return new AbstractGatewayValidator();
         }
     }
+
+
     @Test
     void getGatewayPage_ValidPage() throws Exception {
         final List<AbstractGateway> gatewaysList = generateAbstractGatewayList();
@@ -80,7 +84,22 @@ class GatewayControllerTest {
         result.andExpect(status().isOk())
                 .andExpect(content().string(response));
     }
-
+    @SuppressWarnings("unchecked")
+    @Test
+    void getGatewayPage_ValidPage0() throws Exception {
+        final List<AbstractGateway> gatewaysList = Collections.EMPTY_LIST;
+        final String response = asJsonString(gatewaysList);
+        final MultiValueMap<String, String> requestParams = prepareQueryParams("page", "0", "size", "10");
+        when(this.gatewayService.getAllGatewaysCount()).thenReturn(0);
+        when(this.gatewayService.getGateways(any(), any(), any())).thenReturn(gatewaysList);
+        ResultActions result = mockMvc.perform(
+                get(API_ROOT + GET_ALL_GATEWAYS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .params(requestParams)
+                        .with(httpBasic(securityConfiguration.getName(), securityConfiguration.getPassword())));
+        result.andExpect(status().isOk())
+                .andExpect(content().string(response));
+    }
     @Test
     void getGatewayPage_NotValidPage() throws Exception {
         final String response = "{\"error\":\"Validation failed, getGatewayPage.gatewayPaginationRequest: Requested page 4 is not available.\"}";
@@ -94,6 +113,8 @@ class GatewayControllerTest {
         result.andExpect(status().is4xxClientError())
                 .andExpect(content().string(response));
     }
+
+
     @Test
     void getGateway_ValidGateway() throws Exception {
         final Gateway gateway = generateGateway();
@@ -109,7 +130,7 @@ class GatewayControllerTest {
     }
     @Test
     void getGateway_NotValidGateway() throws Exception {
-        final String response = "{\"error\":\"Requested Gateway with uuid c5aab27d-92ab-4858-bd6e-ebfda0fe48d2 is not Found\"}";
+        final String response = MessageFormat.format(NOT_FOUND_RESPONSE, "Gateway", VALID_UUID_WITH_NO_GATEWAY);
         when(this.gatewayService.getGateway(any(), any(), any())).thenThrow(new EntityNotFoundException(MessageFormat.format(GATEWAY_NOT_FOUND_ERROR_MESSAGE, VALID_UUID_WITH_NO_GATEWAY)));
         ResultActions result = mockMvc.perform(
                 get(API_ROOT + GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, VALID_UUID_WITH_NO_GATEWAY)
@@ -127,6 +148,8 @@ class GatewayControllerTest {
         result.andExpect(status().is4xxClientError())
                 .andExpect(content().string(NOT_VALID_GATEWAY_UUID_MESSAGE));
     }
+
+
     @Test
     void createGateway_ValidRequest() throws Exception {
         final Gateway gateway = generateGateway();
@@ -197,7 +220,6 @@ class GatewayControllerTest {
         result.andExpect(status().is4xxClientError())
                 .andExpect(content().string(response));
     }
-
     @Test
     void createGateway_UnValidRequest_Empty_GatewayUuid() throws Exception {
         final String response = "{\"error\":\"Validation failed, failed to bind value  to field gatewayUuid.\"}";
@@ -278,13 +300,15 @@ class GatewayControllerTest {
         result.andExpect(status().is4xxClientError())
                 .andExpect(content().string(response));
     }
+
+
     @Test
     void updateGateway_successfully() throws Exception {
         Gateway gateway = generateGateway();
         final String response = "{\"message\":\"Gateway Updated successfully\"}";
         when(this.gatewayService.updateGateway(any(), any(), any(), any())).thenReturn(gateway);
         ResultActions result = mockMvc.perform(
-                put(API_ROOT + UPDATE_GATEWAY_DETAILS, VALID_UUID)
+                put(API_ROOT + UPDATE_GATEWAY_DETAILS, GATEWAY_VALID_UUID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(gateway))
                         .with(httpBasic(securityConfiguration.getName(), securityConfiguration.getPassword())));
@@ -294,7 +318,7 @@ class GatewayControllerTest {
     @Test
     void updateGateway_NotFoundGateway() throws Exception {
         Gateway gateway = generateGateway();
-        final String response = "{\"error\":\"Requested Gateway with uuid c5aab27d-92ab-4858-bd6e-ebfda0fe48d2 is not Found\"}";
+        final String response = MessageFormat.format(NOT_FOUND_RESPONSE, "Gateway", VALID_UUID_WITH_NO_GATEWAY);
         when(this.gatewayService.updateGateway(any(), any(), any(), any())).thenThrow(new EntityNotFoundException(MessageFormat.format(GATEWAY_NOT_FOUND_ERROR_MESSAGE, VALID_UUID_WITH_NO_GATEWAY)));
         ResultActions result = mockMvc.perform(
                 put(API_ROOT + UPDATE_GATEWAY_DETAILS, VALID_UUID_WITH_NO_GATEWAY)

@@ -35,7 +35,6 @@ public class GatewayControllerIT {
         assertEquals(JSON_ABSTRACT_GATEWAY_PAGE_4_SIZE_10, gson.toJson(responseEntity.getBody(), AbstractGateway[].class));
         assertEquals(getPaginationLinks(), responseEntity.getHeaders().getFirst("Link"));
     }
-
     @Test
     void getGateways_Parameter_Type_Mismatch_response_400() {
         try {
@@ -49,7 +48,6 @@ public class GatewayControllerIT {
             fail();
         }
     }
-
     @Test
     void getGateways_Fail_Authentication_response_401() {
         try {
@@ -58,20 +56,22 @@ public class GatewayControllerIT {
             fail();
         } catch (final HttpClientErrorException e) {
             assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
-            assertTrue(Objects.requireNonNull(e.getMessage()).contains("\"status\":401,\"error\":\"Unauthorized\",\"path\":\"/gateways-api/api/rest/gateways\"}"));
         } catch (final Exception e) {
             fail();
         }
     }
 
+
     @Test
     void getGateway_with_Valid_UUID_200() {
+        GatewayModel expectedResult = GatewayModel.builder()
+                .gatewayUuid(GATEWAY_VALID_UUID).gatewayIpv4("70.22.2.45").gatewayName("gateway-a3c2316a-3c2d-11ec-a662-0242ac160003").build();
         final ResponseEntity<?> responseEntity = restCall(GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, HttpMethod.GET, new HashMap<>(1),
-                GatewayModel.class, new HashMap<>(1), true, VALID_UUID);
+                GatewayModel.class, new HashMap<>(1), true, GATEWAY_VALID_UUID);
+        expectedResult.setDevices(((GatewayModel) Objects.requireNonNull(responseEntity.getBody())).getDevices());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(GATEWAY_RESPONSE_FOR_VALID_UUID, gson.toJson(responseEntity.getBody(), GatewayModel.class));
+        assertEquals(expectedResult, responseEntity.getBody());
     }
-
     @Test
     void getGateway_With_Valid_UUID_Not_Found_Gateway_404() {
         UUID gatewayUuid = UUID.randomUUID();
@@ -86,7 +86,6 @@ public class GatewayControllerIT {
             fail();
         }
     }
-
     @Test
     void getGateway_with_Not_Valid_UUID_400() {
         try {
@@ -95,7 +94,7 @@ public class GatewayControllerIT {
             fail();
         } catch (final HttpClientErrorException e) {
             assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
-            assertEquals(NOT_VALID_GATEWAY_UUID_ERROR_MESSAGE, e.getMessage());
+            assertEquals(MessageFormat.format(NOT_VALID_GATEWAY_UUID_ERROR_MESSAGE, "getGateway.gateway_uuid", NOT_VALID_UUID), e.getMessage());
         } catch (final Exception e) {
             fail();
         }
@@ -155,15 +154,17 @@ public class GatewayControllerIT {
     @Test
     void updateGateway_with_Valid_UUID_And_Body_200() {
         String newGatewayUuid = UUID.randomUUID().toString();
+        GatewayModel oldGateway = (GatewayModel) restCall(GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, HttpMethod.GET, new HashMap<>(1),
+                GatewayModel.class, new HashMap<>(1), true, GATEWAY_VALID_UUID).getBody();
+
         final ResponseEntity<?> responseEntity = restCall(UPDATE_GATEWAY_DETAILS, HttpMethod.PUT, new HashMap<>(1),
                 String.class, prepareParams("gatewayUuid", newGatewayUuid,
-                        "gatewayName", "gateway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, VALID_UUID);
+                        "gatewayName", "gateway-" + newGatewayUuid, "gatewayIpv4", "71.22.2.50"), true, Objects.requireNonNull(oldGateway).getGatewayUuid());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(GATEWAY_UPDATED_SUCCESSFULLY, responseEntity.getBody());
         @SuppressWarnings("unused")
         final ResponseEntity<?> rollBackUpdateResponseEntity = restCall(UPDATE_GATEWAY_DETAILS, HttpMethod.PUT, new HashMap<>(1),
-                String.class, prepareParams("gatewayUuid", VALID_UUID,
-                        "gatewayName", "gateway-a3c2316a-3c2d-11ec-a662-0242ac160003", "gatewayIpv4", "70.22.2.45"), true, newGatewayUuid);
+                String.class, oldGateway, true, newGatewayUuid);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(GATEWAY_UPDATED_SUCCESSFULLY, responseEntity.getBody());
     }

@@ -4,13 +4,11 @@ import com.musala.gatewaysapi.models.DeviceModel;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Setter
 @Getter
-@Builder
+@Builder(toBuilder=true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="devices")
@@ -46,7 +44,7 @@ public class Device {
                         .devicesName(this.devicesName == null ? "": this.devicesName)
                         .vendor(this.vendor == null ? "": this.vendor)
                         .deviceCreationDate(this.deviceCreationDate == null ? LocalDateTime.MIN: this.deviceCreationDate)
-                        .status(this.status == null ? false: this.status)
+                        .status(this.status != null && this.status)
                         .build();
     }
 }

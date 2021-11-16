@@ -37,7 +37,7 @@ services:
     links:
       - gateways-api
     environment:
-      INSTALL_MYSQL: true
+      INSTALL_MYSQL: 'true'
     volumes:
       - ./src/test/resources:/liquibase/changelog
     command:  ['--driver=com.mysql.cj.jdbc.Driver',
