@@ -6,6 +6,9 @@ import com.musala.gatewaysapi.services.DeviceService;
 import com.musala.gatewaysapi.validations.DeviceModelValidator;
 import com.musala.gatewaysapi.validations.IsUuid;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -103,9 +106,16 @@ public class DeviceController {
     })
     @PostMapping(path = CREATE_NEW_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> createDevice(
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the gateway that contains wanted device. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
             @Valid @IsUuid @PathVariable String gateway_uuid,
-            @Valid @RequestBody DeviceModel deviceModel, BindingResult result,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Valid @RequestBody(description = "Device to be created.", required = true, content = @Content(
+                            schema=@Schema(implementation = DeviceModel.class), mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\"," +
+                                    "\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\"," +
+                                    "\"deviceCreationDate\":\"2021-11-02T22:38:46\",\"status\":true}")})
+            ) DeviceModel deviceModel, BindingResult result,UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         deviceService.createDevice(uriBuilder, response, gateway_uuid,
                 Device.builder().devicesUuid(deviceModel.getDevicesUuid())
@@ -177,7 +187,14 @@ public class DeviceController {
     })
     @GetMapping(path = GET_GATEWAY_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DeviceModel getDevice(
-            @Valid @IsUuid @PathVariable String gateway_uuid, @Valid @IsUuid @PathVariable String device_uuid,
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the gateway that contains wanted device. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String gateway_uuid,
+            @Parameter( in= ParameterIn.PATH, name = "device_uuid",
+                    description="Uuid of the device to be read. Cannot be empty.", required=true,
+                    example = "a3e28a87-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String device_uuid,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         return deviceService.getDevice(uriBuilder, response, gateway_uuid, device_uuid).getDeviceModelFromDevice();
     }
@@ -242,9 +259,20 @@ public class DeviceController {
     })
     @PutMapping(path = UPDATE_GATEWAY_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> updateDevice(
-            @Valid @IsUuid @PathVariable String gateway_uuid, @Valid @IsUuid @PathVariable String device_uuid,
-            @Valid @RequestBody DeviceModel deviceModel, BindingResult result,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the gateway that contains wanted device. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String gateway_uuid,
+            @Parameter( in= ParameterIn.PATH, name = "device_uuid",
+                    description="Uuid of the device to be updated. Cannot be empty.", required=true,
+                    example = "a3e28a87-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String device_uuid,
+            @Valid @RequestBody(description = "Device to update.", required = true, content = @Content(
+                    schema=@Schema(implementation = DeviceModel.class), mediaType = "application/json",
+                    examples = {@ExampleObject(value = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\"," +
+                            "\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\"," +
+                            "\"deviceCreationDate\":\"2021-11-02T22:38:46\",\"status\":true}")})
+            ) DeviceModel deviceModel, BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         deviceService.updateDevice(uriBuilder, response, device_uuid, gateway_uuid, Device.builder().devicesUuid(deviceModel.getDevicesUuid())
                 .devicesName(deviceModel.getDevicesName())
@@ -314,7 +342,14 @@ public class DeviceController {
     })
     @DeleteMapping(path = DELETE_GATEWAY_DEVICE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> deleteDevice(
-            @Valid @IsUuid @PathVariable String gateway_uuid, @Valid @IsUuid @PathVariable String device_uuid,
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the gateway that contains wanted device. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String gateway_uuid,
+            @Parameter( in= ParameterIn.PATH, name = "device_uuid",
+                    description="Uuid of the device to be deleted. Cannot be empty.", required=true,
+                    example = "a3e28a87-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String device_uuid,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         deviceService.deleteDevice(uriBuilder, response, device_uuid, gateway_uuid);
         return ResponseEntity.ok(Collections.singletonMap("message", "Gateway's Device deleted successfully"));

@@ -1,0 +1,1 @@
+docker-compose -f docker-compose-data-base-only.yaml up

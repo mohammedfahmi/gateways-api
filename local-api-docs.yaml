@@ -4,28 +4,32 @@ info:
   description: a private microservice that serves as gateways and devices
   version: v1.0.0
 servers:
-- url: http://localhost:8080/gateways-api
-  description: Generated server url
+  - url: http://localhost:8080/gateways-api
+    description: Generated server url
 security:
-- basicAuth: []
+  - basicAuth: []
 paths:
   /api/rest/{gateway_uuid}/device/{device_uuid}:
     get:
       tags:
-      - getDevice
+        - getDevice
       summary: get a gateway's device
       operationId: getDevice
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: device_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the gateway that contains wanted device. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
+        - name: device_uuid
+          in: path
+          description: Uuid of the device to be read. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3e28a87-3c2d-11ec-a662-0242ac160003
       responses:
         "400":
           description: "bad request, not valid parameter"
@@ -38,15 +42,6 @@ paths:
                   value:
                     error: "Validation failed, getDevice.gateway_uuid: Requested uuid\
                       \ q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -57,6 +52,27 @@ paths:
                   value:
                     error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
         "200":
           description: successfully retrieved a single Device entity
           content:
@@ -72,39 +88,38 @@ paths:
                     vendor: texas tech
                     deviceCreationDate: 2021-11-16T03:08:32.258
                     status: true
-        "401":
-          description: unAuthorized
-          content:
-            application/json:
-              examples:
-                An example Response to an un-Authorized request.:
-                  description: An example Response to an un-Authorized request.
-                  value:
-                    timestamp: 2021-11-16T03:45:26.377+00:00
-                    status: 401
-                    error: Unauthorized
-                    path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
     put:
       tags:
-      - updateDevice
+        - updateDevice
       summary: update a Device details
       operationId: updateDevice
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: device_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the gateway that contains wanted device. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
+        - name: device_uuid
+          in: path
+          description: Uuid of the device to be updated. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3e28a87-3c2d-11ec-a662-0242ac160003
       requestBody:
+        description: Device to update.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DeviceModel'
+            example:
+              devicesUuid: a3e3befe-3c2d-11ec-a662-0242ac160003
+              devicesName: device-a3e3bf16-3c2d-11ec-a662-0242ac160003
+              vendor: texas tech
+              deviceCreationDate: 2021-11-02T22:38:46
+              status: true
         required: true
       responses:
         "400":
@@ -118,15 +133,6 @@ paths:
                   value:
                     error: "Validation failed, updateDevice.gateway_uuid: Requested\
                       \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -137,6 +143,15 @@ paths:
                   value:
                     error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
         "200":
           description: Gateway's Device updated successfully
           content:
@@ -160,20 +175,24 @@ paths:
                     path: /gateways-api/api/rest/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f/device/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
     delete:
       tags:
-      - deleteDevice
+        - deleteDevice
       summary: delete a Device details
       operationId: deleteDevice
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: device_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the gateway that contains wanted device. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
+        - name: device_uuid
+          in: path
+          description: Uuid of the device to be deleted. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3e28a87-3c2d-11ec-a662-0242ac160003
       responses:
         "400":
           description: "bad request, not valid parameter"
@@ -186,15 +205,6 @@ paths:
                   value:
                     error: "Validation failed, deleteDevice.gateway_uuid: Requested\
                       \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -205,6 +215,15 @@ paths:
                   value:
                     error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
         "401":
           description: unAuthorized
           content:
@@ -229,15 +248,17 @@ paths:
   /api/rest/gateway/{gateway_uuid}:
     get:
       tags:
-      - getGateway
+        - getGateway
       summary: get a single Gateway resource
       operationId: getGateway
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the wanted gateway. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
       responses:
         "400":
           description: "bad request, not valid parameter"
@@ -250,15 +271,6 @@ paths:
                   value:
                     error: "Validation failed, getGateway.gateway_uuid: Requested\
                       \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -269,6 +281,27 @@ paths:
                   value:
                     error: Requested Gateway with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
+        "401":
+          description: unAuthorized
+          content:
+            application/json:
+              examples:
+                An example Response to an un-Authorized request.:
+                  description: An example Response to an un-Authorized request.
+                  value:
+                    timestamp: 2021-11-16T03:45:26.377+00:00
+                    status: 401
+                    error: Unauthorized
+                    path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
         "200":
           description: successfully retrieved a single Gateway resource
           content:
@@ -282,34 +315,29 @@ paths:
                     gatewayUuid: a3c23161-3c2d-11ec-a662-0242ac160003
                     gatewayName: gateway-a3c2316a-3c2d-11ec-a662-0242ac160003
                     gatewayIpv4: 70.22.2.45
-        "401":
-          description: unAuthorized
-          content:
-            application/json:
-              examples:
-                An example Response to an un-Authorized request.:
-                  description: An example Response to an un-Authorized request.
-                  value:
-                    timestamp: 2021-11-16T03:45:26.377+00:00
-                    status: 401
-                    error: Unauthorized
-                    path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
     put:
       tags:
-      - updateGateway
+        - updateGateway
       summary: Update Gateway details
       operationId: updateGateway
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the gateway to be updated. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
       requestBody:
+        description: new values of the Gateway to be updated.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AbstractGateway'
+            example:
+              gatewayUuid: a3c231e0-3c2d-11ec-a662-0242ac160003
+              gatewayName: gateway-a3c231e8-3c2d-11ec-a662-0242ac160003
+              gatewayIpv4: 17.50.0.52
         required: true
       responses:
         "400":
@@ -323,15 +351,6 @@ paths:
                   value:
                     error: "Validation failed, updateGateway.gateway_uuid: Requested\
                       \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -342,6 +361,15 @@ paths:
                   value:
                     error: Requested Gateway with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
         "401":
           description: unAuthorized
           content:
@@ -366,20 +394,29 @@ paths:
   /api/rest/{gateway_uuid}/device:
     post:
       tags:
-      - createDevice
+        - createDevice
       summary: create a Device
       operationId: createDevice
       parameters:
-      - name: gateway_uuid
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: gateway_uuid
+          in: path
+          description: Uuid of the gateway that contains wanted device. Cannot be empty.
+          required: true
+          schema:
+            type: string
+          example: a3c221f5-3c2d-11ec-a662-0242ac160003
       requestBody:
+        description: Device to be created.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DeviceModel'
+            example:
+              devicesUuid: a3e3befe-3c2d-11ec-a662-0242ac160003
+              devicesName: device-a3e3bf16-3c2d-11ec-a662-0242ac160003
+              vendor: texas tech
+              deviceCreationDate: 2021-11-02T22:38:46
+              status: true
         required: true
       responses:
         "400":
@@ -393,15 +430,6 @@ paths:
                   value:
                     error: "Validation failed, createDevice.gateway_uuid: Requested\
                       \ uuid q3c23161-3c2d-11ec-a662-0242ac160003 is not valid."
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              examples:
-                An example Response to an Internal Server Error.:
-                  description: An example Response to an Internal Server Error.
-                  value:
-                    error: something went wrong.
         "404":
           description: Requested resource is not found
           content:
@@ -412,6 +440,15 @@ paths:
                   value:
                     error: Requested Device with uuid ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
                       is not Found
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              examples:
+                An example Response to an Internal Server Error.:
+                  description: An example Response to an Internal Server Error.
+                  value:
+                    error: something went wrong.
         "200":
           description: Device created successfully and added to requested gateway
             device list
@@ -438,14 +475,19 @@ paths:
   /api/rest/gateway:
     post:
       tags:
-      - createGateway
+        - createGateway
       summary: create a Gateway
       operationId: createGateway
       requestBody:
+        description: Gateway to be created.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AbstractGateway'
+            example:
+              gatewayUuid: a3c231e0-3c2d-11ec-a662-0242ac160003
+              gatewayName: gateway-a3c231e8-3c2d-11ec-a662-0242ac160003
+              gatewayIpv4: 17.50.0.52
         required: true
       responses:
         "400":
@@ -459,6 +501,12 @@ paths:
                     error: "Validation failed, failed to bind value null to field\
                       \ gatewayUuid, failed to bind value null to field gatewayIpv4,\
                       \ failed to bind value null to field gatewayName."
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "500":
           description: Internal Server Error
           content:
@@ -468,21 +516,6 @@ paths:
                   description: An example Response to an Internal Server Error.
                   value:
                     error: something went wrong.
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: successfully created Gateway entity
-          content:
-            application/json:
-              examples:
-                An example Response to createGateway endpoint.:
-                  description: An example Response to createGateway endpoint.
-                  value:
-                    message: Gateway created successfully
         "401":
           description: unAuthorized
           content:
@@ -495,18 +528,32 @@ paths:
                     status: 401
                     error: Unauthorized
                     path: /gateways-api/api/rest/gateway/ad1275e3-b3ef-48e0-8ce8-fd3fbdf0080f
+        "200":
+          description: successfully created Gateway entity
+          content:
+            application/json:
+              examples:
+                An example Response to createGateway endpoint.:
+                  description: An example Response to createGateway endpoint.
+                  value:
+                    message: Gateway created successfully
   /api/rest/gateways:
     get:
       tags:
-      - getGatewayPage
+        - getGatewayPage
       summary: get a page of Gateways
       operationId: getGatewayPage
       parameters:
-      - name: gatewayPaginationRequest
-        in: query
-        required: true
-        schema:
-          $ref: '#/components/schemas/GatewayPaginationRequest'
+        - name: gatewayPaginationRequest
+          in: query
+          description: "object contains the Query parameters size and page, default\
+          \ values for size is 10 and for page is 0. Cannot be empty."
+          required: true
+          schema:
+            $ref: '#/components/schemas/GatewayPaginationRequest'
+          example:
+            page: 0
+            size: 10
       responses:
         "400":
           description: "bad request, not valid parameter"
@@ -518,6 +565,12 @@ paths:
                   value:
                     error: "Validation failed, failed to bind value four to field\
                       \ page, failed to bind value ten to field size."
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                type: string
         "500":
           description: Internal Server Error
           content:
@@ -527,28 +580,6 @@ paths:
                   description: An example Response to an Internal Server Error.
                   value:
                     error: something went wrong.
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: successfully retrieved a single page of Gateways
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbstractGateway'
-              examples:
-                An example Response to getGatewayPage endpoint.:
-                  description: An example Response to getGatewayPage endpoint.
-                  value:
-                  - gatewayUuid: a3c23161-3c2d-11ec-a662-0242ac160003
-                    gatewayName: gateway-a3c2316a-3c2d-11ec-a662-0242ac160003
-                    gatewayIpv4: 70.22.2.45
-                  - gatewayUuid: a3c231e0-3c2d-11ec-a662-0242ac160003
-                    gatewayName: gateway-a3c231e8-3c2d-11ec-a662-0242ac160003
-                    gatewayIpv4: 17.50.0.52
         "401":
           description: unAuthorized
           content:
@@ -561,6 +592,22 @@ paths:
                     status: 401
                     error: Unauthorized
                     path: /gateways-api/api/rest/gateways
+        "200":
+          description: successfully retrieved a single page of Gateways
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AbstractGateway'
+              examples:
+                An example Response to getGatewayPage endpoint.:
+                  description: An example Response to getGatewayPage endpoint.
+                  value:
+                    - gatewayUuid: a3c23161-3c2d-11ec-a662-0242ac160003
+                      gatewayName: gateway-a3c2316a-3c2d-11ec-a662-0242ac160003
+                      gatewayIpv4: 70.22.2.45
+                    - gatewayUuid: a3c231e0-3c2d-11ec-a662-0242ac160003
+                      gatewayName: gateway-a3c231e8-3c2d-11ec-a662-0242ac160003
+                      gatewayIpv4: 17.50.0.52
 components:
   schemas:
     DeviceModel:

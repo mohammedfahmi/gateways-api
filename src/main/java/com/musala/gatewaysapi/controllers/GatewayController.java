@@ -8,6 +8,9 @@ import com.musala.gatewaysapi.services.GatewayService;
 import com.musala.gatewaysapi.validations.AbstractGatewayValidator;
 import com.musala.gatewaysapi.validations.IsUuid;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -98,8 +101,11 @@ public class GatewayController {
     })
     @GetMapping(path = GET_ALL_GATEWAYS, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AbstractGateway> getGatewayPage(
-            @Valid GatewayPaginationRequest gatewayPaginationRequest, BindingResult result,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Parameter( in= ParameterIn.QUERY, name = "gatewayPaginationRequest", schema =  @Schema(implementation = GatewayPaginationRequest.class),
+                    description="object contains the Query parameters size and page, default values for size is 10 and for page is 0. Cannot be empty.", required=true,
+                    example = "{\"page\": 0, \"size\": 10}")
+            @Valid GatewayPaginationRequest gatewayPaginationRequest,
+            BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         return gatewayService.getGateways(uriBuilder, response, gatewayPaginationRequest);
     }
@@ -165,7 +171,11 @@ public class GatewayController {
     })
     @GetMapping(path = GET_GATEWAY_DETAILS_WITH_ITS_DEVICES, produces = MediaType.APPLICATION_JSON_VALUE)
     public GatewayModel getGateway(
-            @Valid @IsUuid @PathVariable String gateway_uuid, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the wanted gateway. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String gateway_uuid,
+            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         return gatewayService.getGateway(uriBuilder, response, gateway_uuid).getGatewayModelFromGateway();
     }
 
@@ -218,8 +228,11 @@ public class GatewayController {
     })
     @PostMapping(path = CREATE_NEW_GATEWAY, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,String >> createGateway(
-            @Valid @RequestBody AbstractGateway abstractGateway, BindingResult result,
-            UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Valid @RequestBody(description = "Gateway to be created.", required = true, content = @Content(
+                    schema=@Schema(implementation = AbstractGateway.class), mediaType = "application/json",
+                    examples = {@ExampleObject(value = "{\"gatewayUuid\":\"a3c231e0-3c2d-11ec-a662-0242ac160003\"," +
+                            "\"gatewayName\":\"gateway-a3c231e8-3c2d-11ec-a662-0242ac160003\",\"gatewayIpv4\":\"17.50.0.52\"}")})
+            ) AbstractGateway abstractGateway, BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         gatewayService.saveGateway(uriBuilder, response, Gateway.builder()
                 .gatewayIpv4(abstractGateway.getGatewayIpv4())
@@ -288,8 +301,15 @@ public class GatewayController {
     })
     @PutMapping(path = UPDATE_GATEWAY_DETAILS, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,String >> updateGateway(
-            @Valid @IsUuid @PathVariable String gateway_uuid, @Valid @RequestBody AbstractGateway abstractGateway,
-            BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            @Parameter( in= ParameterIn.PATH, name = "gateway_uuid",
+                    description="Uuid of the gateway to be updated. Cannot be empty.", required=true,
+                    example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
+            @Valid @IsUuid @PathVariable String gateway_uuid,
+            @Valid @RequestBody(description = "new values of the Gateway to be updated.", required = true, content = @Content(
+                    schema=@Schema(implementation = AbstractGateway.class), mediaType = "application/json",
+                    examples = {@ExampleObject(value = "{\"gatewayUuid\":\"a3c231e0-3c2d-11ec-a662-0242ac160003\"," +
+                            "\"gatewayName\":\"gateway-a3c231e8-3c2d-11ec-a662-0242ac160003\",\"gatewayIpv4\":\"17.50.0.52\"}")})
+            ) AbstractGateway abstractGateway, BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         gatewayService.updateGateway(uriBuilder, response, gateway_uuid, Gateway.builder()
                 .gatewayIpv4(abstractGateway.getGatewayIpv4())
