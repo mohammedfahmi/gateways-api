@@ -38,7 +38,7 @@ public class Gateway {
     @OneToMany(mappedBy="gateway")
     private List<Device> devices;
 
-    public AbstractGateway getAbstractGatewayFromGateway() {
+    public AbstractGateway toAbstractGateway() {
         return AbstractGateway.builder()
                         .gatewayUuid(this.getGatewayUuid() == null ? "": this.getGatewayUuid())
                         .gatewayName(this.getGatewayName() == null ? "": this.getGatewayName())
@@ -47,18 +47,18 @@ public class Gateway {
 
     }
     @SuppressWarnings("unchecked")
-    public GatewayModel getGatewayModelFromGateway() {
+    public GatewayModel toModel() {
         return GatewayModel.builder()
                         .gatewayUuid(this.getGatewayUuid() == null ? "": this.getGatewayUuid())
                         .gatewayName(this.getGatewayName() == null ? "": this.getGatewayName())
                         .gatewayIpv4(this.getGatewayIpv4() == null ? "": this.getGatewayIpv4())
                         .devices(this.getDevices() == null ? EMPTY_LIST :
-                                this.getDevices().stream().map(Device::getDeviceModelFromDevice).collect(Collectors.toList()))
+                                this.getDevices().stream().map(Device::toModel).collect(Collectors.toList()))
                         .build();
 
     }
 
-    public Device getDeviceFromGatewayByUuid(String deviceUuid) {
+    public Device getDeviceByUuid(String deviceUuid) {
         String notFoundErrorMessage = MessageFormat.format(DEVICE_NOT_FOUND_ERROR_MESSAGE, deviceUuid);
         if(!Optional.ofNullable(this.getDevices()).isPresent())
             throw new EntityNotFoundException(notFoundErrorMessage);

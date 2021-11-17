@@ -1,1 +1,1 @@
-docker-compose -f docker-compose-data-base-only.yaml up
+docker-compose -f docker-compose-data-base-only.yaml up --detach

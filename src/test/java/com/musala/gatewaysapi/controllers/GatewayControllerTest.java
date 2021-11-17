@@ -86,11 +86,26 @@ class GatewayControllerTest {
     }
     @SuppressWarnings("unchecked")
     @Test
-    void getGatewayPage_ValidPage0() throws Exception {
+    void getGatewayPage_ValidPage0_Total0() throws Exception {
         final List<AbstractGateway> gatewaysList = Collections.EMPTY_LIST;
         final String response = asJsonString(gatewaysList);
         final MultiValueMap<String, String> requestParams = prepareQueryParams("page", "0", "size", "10");
         when(this.gatewayService.getAllGatewaysCount()).thenReturn(0);
+        when(this.gatewayService.getGateways(any(), any(), any())).thenReturn(gatewaysList);
+        ResultActions result = mockMvc.perform(
+                get(API_ROOT + GET_ALL_GATEWAYS)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .params(requestParams)
+                        .with(httpBasic(securityConfiguration.getName(), securityConfiguration.getPassword())));
+        result.andExpect(status().isOk())
+                .andExpect(content().string(response));
+    }
+    @Test
+    void getGatewayPage_ValidPage1_Total11() throws Exception {
+        final List<AbstractGateway> gatewaysList = Collections.singletonList(generateGateway().toAbstractGateway());
+        final String response = asJsonString(gatewaysList);
+        final MultiValueMap<String, String> requestParams = prepareQueryParams("page", "1", "size", "10");
+        when(this.gatewayService.getAllGatewaysCount()).thenReturn(11);
         when(this.gatewayService.getGateways(any(), any(), any())).thenReturn(gatewaysList);
         ResultActions result = mockMvc.perform(
                 get(API_ROOT + GET_ALL_GATEWAYS)
@@ -118,7 +133,7 @@ class GatewayControllerTest {
     @Test
     void getGateway_ValidGateway() throws Exception {
         final Gateway gateway = generateGateway();
-        final String response = asJsonString(gateway.getGatewayModelFromGateway());
+        final String response = asJsonString(gateway.toModel());
 
         when(this.gatewayService.getGateway(any(), any(), any())).thenReturn(gateway);
         ResultActions result = mockMvc.perform(
@@ -153,7 +168,7 @@ class GatewayControllerTest {
     @Test
     void createGateway_ValidRequest() throws Exception {
         final Gateway gateway = generateGateway();
-        final String requestBody = asJsonString(gateway.getAbstractGatewayFromGateway());
+        final String requestBody = asJsonString(gateway.toAbstractGateway());
         final String response = "{\"message\":\"Gateway created successfully\"}";
         when(this.gatewayService.saveGateway(any(), any(), any())).thenReturn(gateway);
         ResultActions result = mockMvc.perform(

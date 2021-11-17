@@ -1,8 +1,10 @@
 package com.musala.gatewaysapi.IT;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.musala.gatewaysapi.entities.Device;
 import com.musala.gatewaysapi.models.DeviceModel;
+import com.musala.gatewaysapi.utils.LocalDateTimeAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -20,12 +23,13 @@ import static com.musala.gatewaysapi.IT.TestRestTemplate.restCall;
 import static com.musala.gatewaysapi.constants.ApiMapping.*;
 import static com.musala.gatewaysapi.utils.DevicesTestUtil.*;
 import static com.musala.gatewaysapi.utils.GatewaysTestUtils.*;
+import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith({SpringExtension.class, ITBaseContextExtension.class})
 @Slf4j
 public class DeviceControllerIT {
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     @Test
     void getDevices_successfully_200(){
@@ -104,7 +108,7 @@ public class DeviceControllerIT {
     @Test
     void createDevice_successfully_200(){
         Device createDevice = generateRandomDevice();
-        DeviceModel requestBody = createDevice.getDeviceModelFromDevice();
+        String requestBody = gson.toJson(createDevice.toModel());
         final ResponseEntity<?> responseEntity = restCall(CREATE_NEW_DEVICE, HttpMethod.POST, new HashMap<>(1),
                 String.class, requestBody, true, GATEWAY_VALID_UUID);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -118,7 +122,7 @@ public class DeviceControllerIT {
     }
     @Test
     void createDevice_unAuthorized_fail_401(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         try {
             restCall(CREATE_NEW_DEVICE, HttpMethod.POST, new HashMap<>(1),
                     String.class, requestBody, false, GATEWAY_VALID_UUID);
@@ -131,7 +135,7 @@ public class DeviceControllerIT {
     }
     @Test
     void createDevice_gateway_notFound_fail_404(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         try {
             restCall(CREATE_NEW_DEVICE, HttpMethod.POST, new HashMap<>(1),
                     String.class, requestBody, true, NOT_FOUND_GATEWAY_UUID);
@@ -145,7 +149,7 @@ public class DeviceControllerIT {
     }
     @Test
     void createDevice_notValidGatewayUuid_badRequest_fail_400(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         try {
             restCall(CREATE_NEW_DEVICE, HttpMethod.POST, new HashMap<>(1),
                     String.class, requestBody, true, NOT_VALID_UUID);
@@ -157,14 +161,31 @@ public class DeviceControllerIT {
             fail();
         }
     }
+    @Test
+    void createDevice_notValidCreationDate_badRequest_fail_400(){
+        LocalDateTime creationDate = LocalDateTime.now(UTC).plusDays(1);
+        DeviceModel requestBody = generateRandomDevice().toModel();
+        requestBody.setDeviceCreationDate(creationDate);
+        try {
+            restCall(CREATE_NEW_DEVICE, HttpMethod.POST, new HashMap<>(1),
+                    String.class, requestBody, true, GATEWAY_VALID_UUID);
+            fail();
+        } catch (final HttpClientErrorException e) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+            assertEquals(MessageFormat.format(BINDING_ERROR_MESSAGE, creationDate.toString(), "deviceCreationDate"), e.getMessage());
+        } catch (final Exception e) {
+            fail();
+        }
+    }
 
     @Test
     void updateDevice_successfully_200(){
         DeviceModel oldDevice = (DeviceModel) restCall(GET_GATEWAY_DEVICE, HttpMethod.GET, new HashMap<>(1),
                 DeviceModel.class, new HashMap<>(1), true, GATEWAY_VALID_UUID, DEVICE_VALID_UUID).getBody();
-        DeviceModel newDevice = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel newDevice = generateRandomDevice().toModel();
+        String requestBody = gson.toJson(newDevice);
         final ResponseEntity<?> responseEntity = restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),
-                String.class, newDevice, true, GATEWAY_VALID_UUID, Objects.requireNonNull(oldDevice).getDevicesUuid());
+                String.class, requestBody, true, GATEWAY_VALID_UUID, Objects.requireNonNull(oldDevice).getDevicesUuid());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals("{\"message\":\"Gateway's Device updated successfully\"}" , responseEntity.getBody());
         assertEquals(MessageFormat.format(UPDATE_DEVICE_DISCOVERABILITY, GATEWAY_VALID_UUID, newDevice.getDevicesUuid()),
@@ -179,7 +200,7 @@ public class DeviceControllerIT {
     }
     @Test
     void updateDevice_unAuthorized_fail_401(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         requestBody.setDevicesUuid(DEVICE_VALID_UUID);
         try {
             restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),
@@ -192,37 +213,37 @@ public class DeviceControllerIT {
     }
     @Test
     void updateDevice_gateway_notFound_fail_404(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         requestBody.setDevicesUuid(DEVICE_VALID_UUID);
         try {
             restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),
                     String.class, requestBody, true, NOT_FOUND_GATEWAY_UUID, DEVICE_VALID_UUID);
             fail();
         } catch (final HttpClientErrorException e) {
-            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
             assertEquals(e.getMessage(), MessageFormat.format(GATEWAY_NOT_FOUND_ERROR_MESSAGE, NOT_FOUND_GATEWAY_UUID));
+            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         } catch (final Exception e) {
             fail();
         }
     }
     @Test
     void updateDevice_device_notFound_fail_404(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         requestBody.setDevicesUuid(DEVICE_VALID_UUID);
         try {
             restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),
                     String.class, requestBody, true, GATEWAY_VALID_UUID, NOT_FOUND_DEVICE_UUID);
             fail();
         } catch (final HttpClientErrorException e) {
-            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
             assertEquals(e.getMessage(), MessageFormat.format(DEVICE_NOT_FOUND_ERROR_MESSAGE, NOT_FOUND_DEVICE_UUID));
+            assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
         } catch (final Exception e) {
             fail();
         }
     }
     @Test
     void updateDevice_notValidGatewayUuid_badRequest_fail_400(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         requestBody.setDevicesUuid(DEVICE_VALID_UUID);
         try {
             restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),
@@ -237,7 +258,7 @@ public class DeviceControllerIT {
     }
     @Test
     void updateDevice_notValidDeviceUuid_badRequest_fail_400(){
-        DeviceModel requestBody = generateRandomDevice().getDeviceModelFromDevice();
+        DeviceModel requestBody = generateRandomDevice().toModel();
         requestBody.setDevicesUuid(DEVICE_VALID_UUID);
         try {
             restCall(UPDATE_GATEWAY_DEVICE, HttpMethod.PUT, new HashMap<>(1),

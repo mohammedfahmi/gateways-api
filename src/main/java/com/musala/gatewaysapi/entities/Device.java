@@ -38,7 +38,7 @@ public class Device {
     @JoinColumn(name = "gateway_id", nullable = false)
     private Gateway gateway;
 
-    public DeviceModel getDeviceModelFromDevice() {
+    public DeviceModel toModel() {
         return DeviceModel.builder()
                         .devicesUuid(this.devicesUuid == null ? "": this.devicesUuid)
                         .devicesName(this.devicesName == null ? "": this.devicesName)

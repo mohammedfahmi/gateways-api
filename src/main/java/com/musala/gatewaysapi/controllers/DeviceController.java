@@ -7,7 +7,6 @@ import com.musala.gatewaysapi.validations.DeviceModelValidator;
 import com.musala.gatewaysapi.validations.IsUuid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -21,7 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
@@ -110,12 +117,12 @@ public class DeviceController {
                     description="Uuid of the gateway that contains wanted device. Cannot be empty.", required=true,
                     example = "a3c221f5-3c2d-11ec-a662-0242ac160003")
             @Valid @IsUuid @PathVariable String gateway_uuid,
-            @Valid @RequestBody(description = "Device to be created.", required = true, content = @Content(
+            @Valid @Parameter( in= ParameterIn.DEFAULT, description = "Device to be created.", required = true, content = @Content(
                             schema=@Schema(implementation = DeviceModel.class), mediaType = "application/json",
                             examples = {@ExampleObject(value = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\"," +
                                     "\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\"," +
                                     "\"deviceCreationDate\":\"2021-11-02T22:38:46\",\"status\":true}")})
-            ) DeviceModel deviceModel, BindingResult result,UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            ) @RequestBody DeviceModel deviceModel, BindingResult result,UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         deviceService.createDevice(uriBuilder, response, gateway_uuid,
                 Device.builder().devicesUuid(deviceModel.getDevicesUuid())
@@ -196,7 +203,7 @@ public class DeviceController {
                     example = "a3e28a87-3c2d-11ec-a662-0242ac160003")
             @Valid @IsUuid @PathVariable String device_uuid,
             UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-        return deviceService.getDevice(uriBuilder, response, gateway_uuid, device_uuid).getDeviceModelFromDevice();
+        return deviceService.getDevice(uriBuilder, response, gateway_uuid, device_uuid).toModel();
     }
 
     @Operation(summary = "update a Device details", tags = {"updateDevice"})
@@ -267,12 +274,12 @@ public class DeviceController {
                     description="Uuid of the device to be updated. Cannot be empty.", required=true,
                     example = "a3e28a87-3c2d-11ec-a662-0242ac160003")
             @Valid @IsUuid @PathVariable String device_uuid,
-            @Valid @RequestBody(description = "Device to update.", required = true, content = @Content(
+            @Valid @Parameter( in= ParameterIn.DEFAULT, description = "Device to update.", required = true, content = @Content(
                     schema=@Schema(implementation = DeviceModel.class), mediaType = "application/json",
                     examples = {@ExampleObject(value = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\"," +
                             "\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\"," +
                             "\"deviceCreationDate\":\"2021-11-02T22:38:46\",\"status\":true}")})
-            ) DeviceModel deviceModel, BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+            ) @RequestBody DeviceModel deviceModel, BindingResult result, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
         handleBindResult(result);
         deviceService.updateDevice(uriBuilder, response, device_uuid, gateway_uuid, Device.builder().devicesUuid(deviceModel.getDevicesUuid())
                 .devicesName(deviceModel.getDevicesName())

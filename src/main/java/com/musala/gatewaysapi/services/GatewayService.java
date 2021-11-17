@@ -46,7 +46,7 @@ public class GatewayService {
         return this.gatewayRepository.findAll(gatewaysPageSortedById);
     }
     public List<AbstractGateway> abstractGatewaysPage(Page<Gateway> gateways) {
-        return gateways.getContent().stream().map(Gateway::getAbstractGatewayFromGateway)
+        return gateways.getContent().stream().map(Gateway::toAbstractGateway)
                 .collect(Collectors.toList());
     }
 

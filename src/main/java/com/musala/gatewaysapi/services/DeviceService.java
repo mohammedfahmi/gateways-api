@@ -19,7 +19,7 @@ public class DeviceService {
     private GatewayService gatewayService;
 
     public Device getDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String gatewayUuid, String deviceUuid) {
-        Device device  = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
+        Device device  = gatewayService.getGateway(gatewayUuid).getDeviceByUuid(deviceUuid);
         discoveryService.triggerGetDeviceEntityDiscovery(uriBuilder, response, gatewayUuid);
         return device;
     }
@@ -32,7 +32,7 @@ public class DeviceService {
     }
 
     public Device updateDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String deviceUuid, String gatewayUuid, Device newDevice) {
-        Device oldDevice = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
+        Device oldDevice = gatewayService.getGateway(gatewayUuid).getDeviceByUuid(deviceUuid);
         Device device = Device.builder()
                 .id(oldDevice.getId())
                 .devicesUuid(newDevice.getDevicesUuid())
@@ -47,7 +47,7 @@ public class DeviceService {
     }
 
     public void deleteDevice(UriComponentsBuilder uriBuilder, HttpServletResponse response, String deviceUuid, String gatewayUuid) {
-        Device device = gatewayService.getGateway(gatewayUuid).getDeviceFromGatewayByUuid(deviceUuid);
+        Device device = gatewayService.getGateway(gatewayUuid).getDeviceByUuid(deviceUuid);
         deviceRepository.delete(device);
         discoveryService.triggerDeleteDeviceEntityDiscovery(uriBuilder, response, gatewayUuid);
         deviceRepository.flush();

@@ -168,7 +168,6 @@ public class GatewayControllerIT {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(GATEWAY_UPDATED_SUCCESSFULLY, responseEntity.getBody());
     }
-
     @Test
     void updateGateway_With_Valid_UUID_Not_Found_Gateway_404() {
         String newGatewayUuid = UUID.randomUUID().toString();

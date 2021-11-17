@@ -32,6 +32,7 @@ import static com.musala.gatewaysapi.constants.Constants.GATEWAY_NOT_FOUND_ERROR
 import static com.musala.gatewaysapi.utils.DevicesTestUtil.*;
 import static com.musala.gatewaysapi.utils.GatewaysTestUtils.generateGateway;
 import static com.musala.gatewaysapi.utils.TestUtils.getUriBuilder;
+import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,11 +63,7 @@ class DeviceServiceTest {
         requestedGatewayUuid = UUID.randomUUID().toString();
         uriComponentsBuilder = getUriBuilder();
     }
-    @Test
-    void testme(){
-        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
-        System.out.println(gson.toJson(generateRandomDevice().getDeviceModelFromDevice()));
-    }
+
 
     @Test
     void getDevice_Successfully() {

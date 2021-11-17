@@ -16,7 +16,7 @@ public class DevicesTestUtil {
     public static final String DEVICE_VALID_UUID = "a3e3befe-3c2d-11ec-a662-0242ac160003";
     public static final String NOT_FOUND_DEVICE_UUID = "6f28ec80-8be9-4a4b-b00a-440fb5b828c8";
     public static final String NOT_FOUND_GATEWAY_UUID = "0394dd96-da11-41da-b510-14bde81b7cd0";
-    public static final String GET_DEVICE_RESPONSE_FOR_VALID_UUID = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\",\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\",\"deviceCreationDate\":{\"date\":{\"year\":2021,\"month\":11,\"day\":2},\"time\":{\"hour\":22,\"minute\":38,\"second\":46,\"nano\":0}},\"status\":true}";
+    public static final String GET_DEVICE_RESPONSE_FOR_VALID_UUID = "{\"devicesUuid\":\"a3e3befe-3c2d-11ec-a662-0242ac160003\",\"devicesName\":\"device-a3e3bf16-3c2d-11ec-a662-0242ac160003\",\"vendor\":\"texas tech\",\"deviceCreationDate\":\"2021-11-02T22:38:46\",\"status\":true}";
     public static final String NOT_FOUND_ERROR_MESSAGE = "Requested {0} with uuid {1} is not Found";
     public static final String DEVICE_NOT_FOUND_ERROR_MESSAGE= "404 : ['{'\"error\":\"Requested Device with uuid {0} is not Found\"'}']";
     public static final String NOT_FOUND_RESPONSE = "'{'\"error\":\"Requested Device with uuid {0} is not Found\"'}'";
@@ -33,7 +33,7 @@ public class DevicesTestUtil {
                 .id(random.nextLong())
                 .devicesUuid(UUID.randomUUID().toString())
                 .devicesName("Device-"+UUID.randomUUID())
-                .deviceCreationDate(LocalDateTime.now(UTC))
+                .deviceCreationDate(LocalDateTime.now(UTC).minusDays(1))
                 .vendor("texas tech")
                 .status(true)
                 .gateway(gateway).build();

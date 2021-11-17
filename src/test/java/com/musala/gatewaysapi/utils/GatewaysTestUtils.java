@@ -24,6 +24,7 @@ public class GatewaysTestUtils {
     public static final String NOT_VALID_UUID = "q3c23161-3c2d-11ec-a662-0242ac160003";
     public static final String NOT_VALID_UUID_ERROR = "'{'\"error\":\"Validation failed, {0}: Requested uuid {1} is not valid.\"'}'";
     public static final String NOT_VALID_GATEWAY_UUID_ERROR_MESSAGE = "400 : ['{'\"error\":\"Validation failed, {0}: Requested uuid {1} is not valid.\"'}']";
+    public static final String BINDING_ERROR_MESSAGE = "400 : ['{'\"error\":\"Validation failed, failed to bind value {0} to field {1}.\"'}']";
     public static final String NULL_GATEWAY_FOR_CREATION_ERROR_MESSAGE = "400 : [{\"error\":\"Validation failed, failed to bind value null to field gatewayUuid, failed to bind value null to field gatewayIpv4, failed to bind value null to field gatewayName.\"}]";
     public static final String EMPTY_GATEWAY_FOR_CREATION_ERROR_MESSAGE = "400 : [{\"error\":\"Validation failed, failed to bind value  to field gatewayUuid, failed to bind value  to field gatewayIpv4, failed to bind value  to field gatewayName.\"}]";
     public static final String NOT_VALID_UUID_AND_IPV4_FOR_GATEWAY_CREATION_ERROR_MESSAGE = "400 : [{\"error\":\"Validation failed, failed to bind value q3c23161-3c2d-11ec-a662-0242ac160003 to field gatewayUuid, failed to bind value 1234.14354.2343245.2344 to field gatewayIpv4.\"}]";
@@ -71,7 +72,7 @@ public class GatewaysTestUtils {
         return "<http://localhost:8080/gateways-api/api/rest/gateways?page=5&size=10>; rel=\"collection\"";
     }
     public static List<AbstractGateway> generateAbstractGatewayList() {
-        return generateGatewayList().stream().map(Gateway::getAbstractGatewayFromGateway).collect(Collectors.toList());
+        return generateGatewayList().stream().map(Gateway::toAbstractGateway).collect(Collectors.toList());
     }
     public static List<Gateway> generateGatewayList() {
         return Arrays.asList(

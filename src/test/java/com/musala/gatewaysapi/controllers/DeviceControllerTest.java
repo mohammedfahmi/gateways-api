@@ -77,7 +77,7 @@ public class DeviceControllerTest {
     @Test
     void createDevice_ValidRequest_200() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
 
         when(this.deviceService.createDevice(any(), any(), any(), any())).thenReturn(device);
         ResultActions result = mockMvc.perform(
@@ -91,7 +91,7 @@ public class DeviceControllerTest {
     @Test
     void createDevice_gateway_notFound_fail_404() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String notFoundErrorMessage = MessageFormat.format(NOT_FOUND_ERROR_MESSAGE, "Gateway", device.getGateway().getGatewayUuid());
         final String expectedResponse = MessageFormat.format(NOT_FOUND_RESPONSE, "Gateway", device.getGateway().getGatewayUuid());
 
@@ -107,7 +107,7 @@ public class DeviceControllerTest {
     @Test
     void createDevice_gateway_badUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String unValidUuid = "not UUID";
         final String expectedResponse = MessageFormat.format(NOT_VALID_UUID_ERROR, "createDevice.gateway_uuid", unValidUuid);
         ResultActions result = mockMvc.perform(
@@ -122,7 +122,7 @@ public class DeviceControllerTest {
     void createDevice_device_nullUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDevicesUuid(null);
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "devicesUuid");
 
         ResultActions result = mockMvc.perform(
@@ -137,7 +137,7 @@ public class DeviceControllerTest {
     void createDevice_device_emptyUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDevicesUuid("");
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "devicesUuid");
 
         ResultActions result = mockMvc.perform(
@@ -152,7 +152,7 @@ public class DeviceControllerTest {
     void createDevice_device_notValidUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDevicesUuid("not_uuid");
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "not_uuid", "devicesUuid");
 
         ResultActions result = mockMvc.perform(
@@ -167,7 +167,7 @@ public class DeviceControllerTest {
     void createDevice_device_nullName_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDevicesName(null);
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "devicesName");
 
         ResultActions result = mockMvc.perform(
@@ -182,7 +182,7 @@ public class DeviceControllerTest {
     void createDevice_device_emptyName_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDevicesName("");
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "devicesName");
 
         ResultActions result = mockMvc.perform(
@@ -197,7 +197,7 @@ public class DeviceControllerTest {
     void createDevice_device_nullValue_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setVendor(null);
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "vendor");
 
         ResultActions result = mockMvc.perform(
@@ -212,7 +212,7 @@ public class DeviceControllerTest {
     void createDevice_device_emptyValue_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setVendor("");
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "", "vendor");
 
         ResultActions result = mockMvc.perform(
@@ -227,7 +227,7 @@ public class DeviceControllerTest {
     void createDevice_device_nullStatus_succeed_200() throws Exception {
         final Device device = generateRandomDevice();
         device.setStatus(null);
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse =  "{\"message\":\"Device created successfully and added to requested gateway device list\"}";
         when(this.deviceService.createDevice(any(), any(), any(), any())).thenReturn(device);
         ResultActions result = mockMvc.perform(
@@ -258,7 +258,7 @@ public class DeviceControllerTest {
     void createDevice_device_nullCreationDate_fail_400() throws Exception {
         final Device device = generateRandomDevice();
         device.setDeviceCreationDate(null);
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse = MessageFormat.format(NOT_Valid_RESPONSE, "-999999999-01-01T00:00:00", "deviceCreationDate");
 
         ResultActions result = mockMvc.perform(
@@ -274,7 +274,7 @@ public class DeviceControllerTest {
     @Test
     void getDevice_ValidRequest_200() throws Exception {
         final Device device = generateRandomDevice();
-        final String response = gson.toJson(device.getDeviceModelFromDevice());
+        final String response = gson.toJson(device.toModel());
 
         when(this.deviceService.getDevice(any(), any(), any(), any())).thenReturn(device);
         ResultActions result = mockMvc.perform(
@@ -343,7 +343,7 @@ public class DeviceControllerTest {
     @Test
     void updateDevice_ValidRequest_200() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String expectedResponse =  "{\"message\":\"Gateway's Device updated successfully\"}";
 
         when(this.deviceService.updateDevice(any(), any(), any(), any(), any())).thenReturn(device);
@@ -358,7 +358,7 @@ public class DeviceControllerTest {
     @Test
     void updateDevice_resource_notFound_fail_404() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String notFoundErrorMessage = MessageFormat.format(NOT_FOUND_ERROR_MESSAGE, "Gateway", device.getGateway().getGatewayUuid());
         final String expectedResponse = MessageFormat.format(NOT_FOUND_RESPONSE, "Gateway", device.getGateway().getGatewayUuid());
 
@@ -374,7 +374,7 @@ public class DeviceControllerTest {
     @Test
     void updateDevice_gateway_badUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String unValidUuid = "not UUID";
         final String expectedResponse = MessageFormat.format(NOT_VALID_UUID_ERROR, "updateDevice.gateway_uuid", unValidUuid);
 
@@ -389,7 +389,7 @@ public class DeviceControllerTest {
     @Test
     void updateDevice_device_badUuid_fail_400() throws Exception {
         final Device device = generateRandomDevice();
-        final String body = gson.toJson(device.getDeviceModelFromDevice());
+        final String body = gson.toJson(device.toModel());
         final String unValidUuid = "not UUID";
         final String expectedResponse = MessageFormat.format(NOT_VALID_UUID_ERROR, "updateDevice.device_uuid", unValidUuid);
 

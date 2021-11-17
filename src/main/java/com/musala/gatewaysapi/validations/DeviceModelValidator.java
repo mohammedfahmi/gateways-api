@@ -28,6 +28,7 @@ public class DeviceModelValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         DeviceModel requestBody = (DeviceModel) target;
+        log.info("request object: "+ requestBody);
         try {
             Assert.notNull(requestBody.getDevicesUuid(), DEFAULT_REQUESTED_DEVICE_UUID_IS_NOT_VALID);
             Assert.hasText(requestBody.getDevicesUuid(), DEFAULT_REQUESTED_DEVICE_UUID_IS_NOT_VALID);
